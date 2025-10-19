@@ -1,0 +1,16 @@
+/* Set Inter font as default */
+body {
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+/* Custom scrollbar style */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: #4f46e5; /* Indigo-600 */
+    border-radius: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #111827; /* Gray-900 */
+}

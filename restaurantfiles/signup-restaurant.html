@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Registration - MenuMaster</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/x-icon" href="../assest/logo/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assest/css/restaurant/dashboard-restaurant.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-gray-800 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="../commonfiles/main-page.html" class="text-2xl font-extrabold text-indigo-400">Menu<span class="text-white">Master</span></a>
+                </div>
+                <!-- Menu -->
+                <div class="flex space-x-4 items-center">
+                    <a href="login.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Log In</a>
+                    <a href="signup.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-lg bg-gray-800 p-8 rounded-2xl shadow-2xl border border-gray-700">
+            <h2 class="text-3xl font-extrabold text-center text-white mb-6">Register Your Restaurant</h2>
+            
+            <!-- Restaurant Signup Form -->
+            <form id="restaurant-signup-form" class="space-y-5">
+                <!-- Restaurant Name -->
+                <div>
+                    <label for="restaurantName" class="text-sm font-medium text-gray-300">Restaurant Name</label>
+                    <input id="restaurantName" name="restaurantName" type="text" required
+                           class="mt-2 w-full p-3 text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                           placeholder="e.g., The Gourmet Place">
+                </div>
+
+                <!-- Restaurant Address -->
+                <div>
+                    <label for="address" class="text-sm font-medium text-gray-300">Restaurant Address</label>
+                    <input id="address" name="address" type="text" required
+                           class="mt-2 w-full p-3 text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                           placeholder="123 Main Street, City">
+                </div>
+                
+                <hr class="border-gray-600 my-4">
+
+                <h3 class="text-lg font-semibold text-indigo-300 text-center">Owner Information</h3>
+
+                <!-- Full Name -->
+                <div>
+                    <label for="ownerName" class="text-sm font-medium text-gray-300">Your Full Name</label>
+                    <input id="ownerName" name="ownerName" type="text" autocomplete="name" required
+                           class="mt-2 w-full p-3 text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                           placeholder="Name Surname">
+                </div>
+                
+                <!-- Owners Eposta -->
+                <div>
+                    <label for="email" class="text-sm font-medium text-gray-300">Contact Email</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required
+                           class="mt-2 w-full p-3 text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                           placeholder="you@example.com">
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password" class="text-sm font-medium text-gray-300">Pasword</label>
+                    <input id="password" name="password" type="password" autocomplete="new-password" required
+                           class="mt-2 w-full p-3 text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                           placeholder="Create a strong password for your safety &#x1F512;">
+                </div>
+                
+                <!-- Success/Error Message  -->
+                <div id="message" class="text-sm text-center"></div>
+
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit"
+                            class="w-full mt-4 px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-md">
+                        Register Restaurant
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 border-t border-gray-700 mt-auto">
+        <p class="text-gray-500 text-sm">&copy; 2025 MenuMaster - All rights reserved.</p>
+    </footer>
+
+    <script src="../assest/js/restaurant/signup-restaurant.js"></script>
+</body>
+</html>

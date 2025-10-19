@@ -1,0 +1,79 @@
+/* --- General Body & Theme --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #111827; /* Fallback bg-gray-900 */
+    /* A more subtle and professional vertical gradient */
+    background-image: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+    color: #f3f4f6; /* text-gray-100 */
+    overflow-x: hidden; /* Prevent horizontal scrollbars */
+    /* Add font smoothing for better text rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Custom Scrollbar --- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #4338ca; /* A slightly deeper indigo for contrast */
+    border-radius: 10px;
+    border: 2px solid #1f2937; /* Add a track-colored border for a thinner look */
+}
+::-webkit-scrollbar-track {
+    background: #1f2937; /* Gray-800 */
+}
+
+/* --- Form Inputs Styling --- */
+input {
+    /* Smoother and slightly faster transition */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* A cleaner, more subtle focus state without the "fake" glow */
+input:focus {
+    outline: none;
+    border-color: #6366f1; /* A crisp indigo border */
+    /* A very subtle inner shadow to indicate depth */
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* --- General Button Styling --- */
+button {
+    /* Slightly faster transition for a snappier feel */
+    transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+/* A more understated hover effect */
+button:hover:not(:disabled) {
+    transform: translateY(-1px); /* Reduced lift */
+    /* The button color will be brightened by the Tailwind hover class, which is enough */
+}
+
+button:active:not(:disabled) {
+    transform: translateY(0px); /* Push button back down on click */
+}
+
+button:disabled {
+    cursor: not-allowed;
+    /* Tailwind already handles opacity, so this is fine */
+}
+
+/* --- Entrance Animation for the main form card --- */
+/* To use this, add class="fade-in-card" to the main form container div in your HTML */
+.fade-in-card {
+    /* Slower, more deliberate animation */
+    animation: fadeIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+

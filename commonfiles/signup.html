@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - MenuMaster</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/x-icon" href="../assest/logo/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-gray-800 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="main-page.html" class="text-2xl font-extrabold text-indigo-400">Menu<span class="text-white">Master</span></a>
+                </div>
+                <!-- Menu -->
+                <div class="flex space-x-4 items-center">
+                    <a href="login.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Log In</a>
+                    <a href="signup.html" class="text-gray-300 bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-gray-800 p-8 rounded-2xl shadow-2xl border border-gray-700">
+            <h2 class="text-3xl font-extrabold text-center text-white mb-6">Create Your Account</h2>
+            
+            <!-- Signup -->
+            <form id="signup-form" class="space-y-6">
+                <!-- Name In -->
+                <div>
+                    <label for="name" class="text-sm font-medium text-gray-300">Full Name</label>
+                    <input id="name" name="name" type="text" autocomplete="name" required
+                           class="mt-2 w-full p-3 text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+                           placeholder="Name Surname">
+                </div>
+                <!-- Email Input -->
+                <div>
+                    <label for="email" class="text-sm font-medium text-gray-300">Email</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required
+                           class="mt-2 w-full p-3 text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+                           placeholder="you@example.com">
+                </div>
+                <!-- Password Input -->
+                <div>
+                    <label for="password" class="text-sm font-medium text-gray-300">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="new-password" required
+                           class="mt-2 w-full p-3 text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+                           placeholder="Create a strong password">
+                </div>
+                
+                <!-- Success/Error Message -->
+                <div id="message" class="text-sm text-center"></div>
+
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit"
+                            class="w-full px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-md">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+
+            <!-- Login Link -->
+            <p class="mt-8 text-center text-sm text-gray-400">
+                Already have an account?
+                <a href="login.html" class="font-medium text-indigo-400 hover:text-indigo-300">Log in</a>
+            </p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 border-t border-gray-700 mt-auto">
+        <p class="text-gray-500 text-sm">&copy; 2025 MenuMaster - All rights reserved.</p>
+    </footer>
+
+    <script src="../assest/js/user/signup.js"></script>
+</body>
+</html>
