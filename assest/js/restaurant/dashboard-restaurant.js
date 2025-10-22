@@ -151,6 +151,42 @@ const renderReviewsView = async () => {
     mainContentEl.innerHTML = content;
 };
 
+const renderTicketsView = async () => {
+    showLoading();
+    const data = await fetchData('tickets');
+    if (!data) return;
+
+    mainContentEl.innerHTML = `
+        <h2 class="text-3xl font-bold mb-6 text-white">Support Tickets</h2>
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <table class="w-full text-left">
+                 <thead>
+                    <tr class="border-b border-gray-700">
+                        <th class="p-3">Ticket ID</th>
+                        <th class="p-3">User</th>
+                        <th class="p-3">Subject</th>
+                        <th class="p-3">Status</th>
+                        <th class="p-3">Last Updated</th>
+                        <th class="p-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.tickets.map(t => `
+                        <tr class="border-b border-gray-700 hover:bg-gray-700/50">
+                            <td class="p-3 font-mono text-xs text-gray-400">${t.id}</td>
+                            <td class="p-3">${t.user.name}</td>
+                            <td class="p-3 font-medium">${t.subject}</td>
+                            <td class="p-3"><span class="px-3 py-1 text-xs font-semibold rounded-full ${t.status === 'Open' ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-300'}">${t.status}</span></td>
+                            <td class="p-3">${new Date(t.lastUpdate).toLocaleString()}</td>
+                            <td class="p-3"><button data-id="${t.id}" class="view-ticket-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded-md transition">View</button></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+};
+
 /** Renders the Settings View */
 const renderSettingsView = async () => {
     showLoading();
@@ -261,6 +297,7 @@ const handleNavigation = (e) => {
         case 'reservations': renderReservationsView(); break;
         case 'menu': renderMenuView(); break;
         case 'reviews': renderReviewsView(); break;
+        case 'tickets': renderTicketsView(); break;
         case 'settings': renderSettingsView(); break;
     }
 };
