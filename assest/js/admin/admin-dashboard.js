@@ -277,5 +277,61 @@ document.addEventListener('DOMContentLoaded', () => {
     sidebarNav.addEventListener('click', handleNavigation);
     mainContentEl.addEventListener('click', handleMainContentClick);
     renderAllReservationsView();
+    // --- ADD RESTAURANT VIEW ---
+
+const renderAddRestaurantView = () => {
+    mainContentEl.innerHTML = `
+        <h2 class="text-3xl font-bold mb-6 text-white">Add New Restaurant</h2>
+        
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-xl">
+            <form id="add-restaurant-form" class="space-y-4">
+
+                <div>
+                    <label class="text-gray-300 font-medium">Restaurant Name</label>
+                    <input type="text" id="rest-name" class="w-full mt-1 p-2 bg-gray-900 text-white rounded-md"
+                        placeholder="Example: Pizza House" required>
+                </div>
+
+                <div>
+                    <label class="text-gray-300 font-medium">Location</label>
+                    <input type="text" id="rest-location" class="w-full mt-1 p-2 bg-gray-900 text-white rounded-md"
+                        placeholder="City, Street, Number" required>
+                </div>
+
+                <div>
+                    <label class="text-gray-300 font-medium">Owner Email</label>
+                    <input type="email" id="rest-owner" class="w-full mt-1 p-2 bg-gray-900 text-white rounded-md"
+                        placeholder="owner@example.com" required>
+                </div>
+
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-md transition">
+                    Add Restaurant
+                </button>
+            </form>
+        </div>
+    `;
+};
+
+// --- FORM SUBMIT HANDLER ---
+document.addEventListener('submit', async (e) => {
+    if (e.target.id === 'add-restaurant-form') {
+        e.preventDefault();
+        
+        const name = document.getElementById('rest-name').value.trim();
+        const location = document.getElementById('rest-location').value.trim();
+        const owner = document.getElementById('rest-owner').value.trim();
+
+        const result = await fetchData('restaurants', {
+            method: 'POST',
+            body: JSON.stringify({ name, location, owner })
+        });
+
+        if (result) {
+            alert("Restaurant successfully added!");
+            renderRestaurantsView();
+        }
+    }
+});
+
 });
 

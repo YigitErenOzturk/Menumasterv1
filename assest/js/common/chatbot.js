@@ -1,90 +1,89 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // DOM Elements
-    const chatIcon = document.getElementById('chat-icon');
-    const chatWindow = document.getElementById('chat-window');
-    const closeChatBtn = document.getElementById('close-chat');
-    const chatBody = document.getElementById('chat-body');
-    const chatInput = document.getElementById('chat-input');
-    const sendBtn = document.getElementById('send-btn');
+    // --- DOM Elements ---
+    const $ = (id) => document.getElementById(id);
+    const chatIcon = $('chat-icon');
+    const chatWindow = $('chat-window');
+    const closeChatBtn = $('close-chat');
+    const chatBody = $('chat-body');
+    const chatInput = $('chat-input');
+    const sendBtn = $('send-btn');
 
-    // --- Event Listeners ---
-    chatIcon.addEventListener('click', () => {
-        chatWindow.classList.toggle('open');
-    });
+    // --- Chat toggle ---
+    chatIcon.addEventListener('click', () => chatWindow.classList.toggle('open'));
+    closeChatBtn.addEventListener('click', () => chatWindow.classList.remove('open'));
 
-    closeChatBtn.addEventListener('click', () => {
-        chatWindow.classList.remove('open');
-    });
-    
+    // --- Send message ---
     sendBtn.addEventListener('click', handleUserMessage);
-    chatInput.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            handleUserMessage();
+    chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleUserMessage());
+
+    // --- AI Response Map ---
+    const responses = [
+        {
+            keywords: ["restaurant", "register", "sign"],
+            reply: "Registering your restaurant is simple! Just click 'Register Now' on the homepage."
+        },
+        {
+            keywords: ["commands", "codes", "help list"],
+            reply: "Available commands: restaurant, register, order, track, discount, cheap, support, hello, menu"
+        },
+        {
+            keywords: ["order", "track", "where"],
+            reply: "You can track your order in the 'My Orders' section after logging in."
+        },
+        {
+            keywords: ["discount", "cheap", "promo", "campaign"],
+            reply: "You can check all current promotions from the 'Featured Deals' section on the homepage."
+        },
+        {
+            keywords: ["help", "hello", "hi", "hey"],
+            reply: "Hello! 👋 I'm MenuMaster Bot. Ask me anything about registration, orders, or campaigns."
+        },
+        {
+            keywords: ["menu", "food", "list"],
+            reply: "Our menu contains hundreds of restaurants! What are you looking for?"
         }
-    });
+    ];
 
-    // --- Functions ---
-
-    // Handles sending the user's message
+    // --- Message Handling ---
     function handleUserMessage() {
-        const messageText = chatInput.value.trim();
-        if (messageText === '') return;
+        const text = chatInput.value.trim();
+        if (!text) return;
 
-        // Display user's message
-        appendMessage('user', messageText);
-        chatInput.value = '';
+        appendMessage('user', text);
+        chatInput.value = "";
 
-        // Get and display bot's response
         setTimeout(() => {
-            const botResponse = getBotResponse(messageText);
-            appendMessage('bot', botResponse);
-        }, 500); // Simulate bot thinking
+            const response = getBotResponse(text);
+            appendMessage('bot', response);
+        }, 400);
     }
 
-    // Appends a message to the chat body
+    // --- Append message ---
     function appendMessage(sender, text) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('chat-message', `${sender}-message`);
-        messageDiv.innerText = text;
-        chatBody.appendChild(messageDiv);
-        
-        // Scroll to the bottom
+        const div = document.createElement('div');
+        div.className = `chat-message ${sender}-message`;
+        div.innerText = text;
+        chatBody.appendChild(div);
         chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    // Determines the bot's response
-    function getBotResponse(userInput) {
-        const lowerInput = userInput.toLowerCase();
+    // --- Determine Response ---
+    function getBotResponse(input) {
+        const lower = input.toLowerCase();
 
-        // --- PREDEFINED QUESTIONS AND ANSWERS ---
-        if (lowerInput.includes('restaurant') && lowerInput.includes('register')) {
-            return "Registering your restaurant is easy! Start by clicking the 'Register Now' button on the homepage.";
-        }
-        if (lowerInput.includes('commands') && lowerInput.includes('codes')) {
-            return "restaurant,register,order,track,discount,cheap,help,hello";
-        }
-        
-        if (lowerInput.includes('order') && lowerInput.includes('track')) {
-            return "To track your order, you can visit the 'My Orders' section after logging in.";
+        // search for matching keyword group
+        for (const rule of responses) {
+            if (rule.keywords.some(k => lower.includes(k))) {
+                return rule.reply;
+            }
         }
 
-        if (lowerInput.includes('discount') || lowerInput.includes('cheap')) {
-            return "Great question! You can always find our current promotions in the 'Featured Deals' section on our homepage.";
-        }
-
-        if (lowerInput.includes('help') || lowerInput.includes('hello')) {
-            return "Hello! 👋 I'm MenuMaster Bot. How can I help you? You can ask questions about 'restaurant registration', 'order tracking', or 'campaigns'.";
-        }
-
-        // response if no keyword is matched
-        return "Sorry, I didn't understand this question. Please try asking it differently. For commands write commands !";
+        // fallback response
+        return "I didn't understand that. Try using a command. Type: commands";
     }
-    
-    // Initial bot welcome message
-    function showWelcomeMessage() {
-        appendMessage('bot', "Hello! Welcome to MenuMaster. How can I help you?");
-    }
-    
-    showWelcomeMessage();
+
+    // --- Welcome message ---
+    appendMessage('bot', "Hello! Welcome to MenuMaster 👋 How can I assist you today?");
+
 });
