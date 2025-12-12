@@ -13,29 +13,41 @@
             background-color: #111827; /* Gray-900 */
             color: #f3f4f6; /* Gray-100 */
         }
+        
+        .rating > input { display: none; }
+        .rating > label:before {
+            content: "\2605"; /* Unicode star */
+            font-size: 2em;
+            cursor: pointer;
+        }
+        .rating > label {
+            color: #4b5563; /* Gray-600 */
+            float: right;
+        }
+        .rating > input:checked ~ label, 
+        .rating:not(:checked) > label:hover, 
+        .rating:not(:checked) > label:hover ~ label {
+            color: #FBBF24; /* Yellow-400 */
+        }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <!-- Simplified Navbar -->
     <nav class="bg-gray-800 shadow-md sticky top-0 z-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="../commonfiles/main-page.html" class="text-2xl font-extrabold text-indigo-400">Menu<span class="text-white">Master</span></a>
-                <a href="../userfiles/dashboard-preview.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">&larr; Back to Dashboard</a>
+                <a href="../userfiles/dashboard-preview.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">← Back to Dashboard</a>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content Area -->
     <div id="main-content" class="max-w-7xl mx-auto p-4 md:p-8">
-        <!-- Loading indicator -->
         <p id="loading-indicator" class="text-center text-gray-400 text-lg">Loading restaurant details...</p>
     </div>
 
-    <!-- Footer -->
     <footer class="text-center py-6 border-t border-gray-700 mt-8">
-        <p class="text-gray-500 text-sm">&copy; 2025 MenuMaster - All rights reserved.</p>
+        <p class="text-gray-500 text-sm">© 2025 MenuMaster - All rights reserved.</p>
     </footer>
 
     <script>
@@ -45,119 +57,225 @@
 
         // --- DOM Elements ---
         const mainContentEl = document.getElementById('main-content');
-        const loadingIndicator = document.getElementById('loading-indicator');
+        // The value of loadingIndicator may be null after the page has loaded, this is important!
+        const loadingIndicator = document.getElementById('loading-indicator'); 
 
-        // --- Core Functions ---
+        // --- Utility Functions ---
 
-        /**
-         * Gets the restaurant name from the URL query parameters.
-         * @returns {string|null} The restaurant name or null if not found.
-         */
         const getRestaurantNameFromURL = () => {
             const params = new URLSearchParams(window.location.search);
-            // For preview, default to the mock data restaurant if no name is in URL
-            return params.get('name') || 'Turecki Szama Memo';
+            // Returns the 'name' parameter from the URL. Otherwise, uses the default.
+            return params.get('name') || 'Default Demo Restaurant';
         };
 
         /**
-         * Fetches restaurant details. For this preview, it always returns mock data.
-         * @param {string} restaurantName - The name of the restaurant to fetch.
+         * A generic function that sends a request to the API. In case of an error, it returns an error object.
          */
-        const fetchRestaurantDetails = async (restaurantName) => {
-            // This function is modified to ALWAYS return mock data for the preview to work.
-            console.log(`Preview mode: Loading mock data for "${restaurantName}"`);
-            return Promise.resolve({
-                name: 'Turecki Szama Memo',
-                cuisine: 'Turkish, Kebab',
-                address: 'ul. Glogowska 107 Poznan Poland',
-                imageUrl: 'https://i.hizliresim.com/e1xcc89.jpeg',
-                rating: 4.7,
-                reviewCount: 1250,
+        const fetchData = async (endpoint, options = {}) => {
+            const url = `${API_BASE_URL}/${endpoint}`;
+            const authToken = localStorage.getItem('authToken');
+            
+            const headers = {
+                'Content-Type': 'application/json',
+                ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+            };
+
+            try {
+                const response = await fetch(url, { headers, ...options });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: 'Server responded with an error status.' }));
+                    throw new Error(errorData.message || `HTTP Error! Status: ${response.status}`);
+                }
+                
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    return await response.json();
+                } else {
+                    return {}; 
+                }
+
+            } catch (error) {
+                console.error("API Fetch Error:", error);
+                // its error for if there is an api connection problem
+                return { error: true, message: `Failed to connect to API: ${error.message}` };
+            }
+        };
+        
+        // --- MOCK DATA FALLBACK ---
+        const getMockDetails = (name) => {
+            console.warn(`API connection failed. Showing MOCK data for "${name}".`);
+            return {
+                name: name,
+                cuisine: 'Error (No Connection)',
+                address: 'Error (No Connection)',
+                phone: 'Error (No Connection)',
+                website: 'Error (No Connection)',
+                // Real Google Maps
+                mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2036.012589578278!2d16.941457415848834!3d52.40422117981014!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47045b36449179d7%3A0x86831d10e201b1e7!2sKebab%20Turecki%20Szama%20Memo%20%7C%20Pozna%C5%84%2C%20G%C5%82ogowska!5e0!3m2!1sen!2spl!4v1620000000000!5m2!1sen!2spl',
+                imageUrl: '',
+                rating: 5.0, // Grade
+                reviewCount: 99,
                 menu: [
-                    { name: 'Kebab', price: '35 PLN' },
-                    { name: 'Baklava', price: '5 PLN' },
-                    { name: 'Ayran', price: '5 PLN' },
-                    { name: 'Pide', price: '25 PLN' },
+                    { name: 'Error (No Connection) ', price: 'Error (No Connection)' },
+                    { name: 'Error (No Connection) ', price: 'Error (No Connection)' },
+                    { name: 'Error (No Connection) ', price: 'Error (No Connection)' },
                 ],
                 reviews: [
-                    { user: 'Ahmad Make', rating: 5, comment: 'Best kebab I have ever had. You must try the oven-baked one!' },
-                    { user: 'Alihan Korkmaz', rating: 4, comment: 'The place is very authentic and beautiful. It was a bit crowded, but worth the wait.' },
+                    { user: 'Error (No Connection)', rating: 5, comment: 'Error (No Connection)' },
+                    { user: 'Error (No Connection)', rating: 3, comment: 'Error (No Connection)' },
                 ]
-            });
+            };
         };
 
         /**
+         * if no api it will use offline datas
+         */
+        const fetchRestaurantDetails = async (restaurantName) => {
+            if (!restaurantName) {
+                return { error: true, message: 'No restaurant selected.' };
+            }
+            
+            const endpoint = `restaurants/${encodeURIComponent(restaurantName)}`;
+            
+            const data = await fetchData(endpoint);
+            
+            // If no Data from api change to offline
+            if (data.error || !data.name) {
+                return getMockDetails(restaurantName);
+            }
+            
+            // if API Succesfull 
+            return data;
+        };
+
+
+        /**
+         * Function for to grade with stars to restaunt
+         */
+        const createStarSvg = (rating, index) => {
+            const colorClass = index < Math.round(rating) ? 'text-yellow-400' : 'text-gray-600';
+            return `<svg class="w-6 h-6 ${colorClass}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
+        };
+        
+        /**
          * Renders the page with the fetched restaurant data.
-         * @param {object} data - The object containing restaurant details.
          */
         const renderPage = (data) => {
-            if (data.error) {
+            if (data.error && data.message !== 'Failed to connect to API: NetworkError') {
                 mainContentEl.innerHTML = `<p class="text-center text-red-400 text-lg">${data.message}</p>`;
                 return;
             }
 
-            // Generate star ratings
-            let stars = '';
-            for (let i = 0; i < 5; i++) {
-                stars += `<svg class="w-6 h-6 ${i < Math.round(data.rating) ? 'text-yellow-400' : 'text-gray-600'}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
-            }
-
-            // Convert menu and reviews to HTML
-            const menuHtml = data.menu.map(item => `
+            const stars = Array(5).fill(0).map((_, i) => createStarSvg(data.rating, i)).join('');
+            const menuItems = Array.isArray(data.menu) ? data.menu : [];
+            const menuHtml = menuItems.map(item => `
                 <li class="flex justify-between items-center py-3 border-b border-gray-700">
-                    <span class="text-gray-300">${item.name}</span>
-                    <span class="font-semibold text-indigo-400">${item.price}</span>
+                    <span class="text-gray-300">${item.name || 'Unknown Item'}</span>
+                    <span class="font-semibold text-indigo-400">${item.price || 'N/A'}</span>
                 </li>
             `).join('');
 
-            const reviewsHtml = data.reviews.map(review => `
+            const reviewsArray = Array.isArray(data.reviews) ? data.reviews : [];
+            const reviewsHtml = reviewsArray.length === 0 ? '<p class="text-gray-400">Be the first to leave a review!</p>' : reviewsArray.map(review => {
+                const reviewStars = Array(5).fill(0).map((_, i) => createStarSvg(review.rating, i)).join('');
+                return `
                 <div class="py-4 border-b border-gray-700">
                     <div class="flex items-center mb-1">
-                        <p class="font-semibold text-white mr-2">${review.user}</p>
-                        <div class="flex">
-                            ${Array(5).fill(0).map((_, i) => `<svg class="w-4 h-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-600'}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`).join('')}
-                        </div>
+                        <p class="font-semibold text-white mr-2">${review.user || 'Anonim'}</p>
+                        <div class="flex">${reviewStars}</div>
                     </div>
-                    <p class="text-gray-400 italic">"${review.comment}"</p>
-                </div>
-            `).join('');
+                    <p class="text-gray-400 italic">"${review.comment || 'No comment provided.'}"</p>
+                </div>`;
+            }).join('');
 
-            // Create the full page content
+
+            // Main Content
             mainContentEl.innerHTML = `
-                <!-- Header and Image -->
                 <header class="relative rounded-2xl overflow-hidden mb-8 shadow-2xl">
-                    <img src="${data.imageUrl}" alt="${data.name}" class="w-full h-48 md:h-64 object-cover">
+                    <img src="${data.imageUrl || 'https://placehold.co/1200x400/4f46e5/ffffff?text=Restaurant'}" alt="${data.name}" class="w-full h-48 md:h-64 object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 p-4 md:p-8">
                         <h1 class="text-4xl md:text-5xl font-extrabold text-white">${data.name}</h1>
-                        <p class="text-lg text-indigo-300 font-semibold">${data.cuisine}</p>
+                        <p class="text-lg text-indigo-300 font-semibold">${data.cuisine || 'Cuisine Missing'}</p>
                         <div class="flex items-center mt-2">
                             ${stars}
-                            <span class="ml-2 text-gray-300">(${data.reviewCount} reviews)</span>
+                            <span class="ml-2 text-gray-300 font-medium">${data.rating ? data.rating.toFixed(1) : 'N/A'}/5.0 (${data.reviewCount || 0} reviews)</span>
                         </div>
                     </div>
                 </header>
 
-                <!-- Main Section (Menu, Reviews, Reservation) -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Left Side (Menu & Reviews) -->
                     <div class="lg:col-span-2 space-y-8">
-                        <!-- Menu -->
+                        
                         <section class="bg-gray-800 p-6 rounded-xl shadow-lg">
-                            <h2 class="text-2xl font-bold text-white mb-4 border-b-2 border-indigo-500 pb-2">Menu</h2>
-                            <ul id="menu-list">${menuHtml}</ul>
+                            <h2 class="text-2xl font-bold text-white mb-4 border-b-2 border-indigo-500 pb-2">Location</h2>
+                            <div class="h-64 rounded-lg overflow-hidden border border-gray-700">
+                                <iframe 
+                                    src="${data.mapEmbedUrl || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.285854817743!2d-73.98566438459422!3d40.74844079326888!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259e515d97d07%3A0xc7f96023d240c4a!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus'}" 
+                                    width="100%" 
+                                    height="100%" 
+                                    style="border:0;" 
+                                    allowfullscreen="" 
+                                    loading="lazy" 
+                                    referrerpolicy="no-referrer-when-downgrade">
+                                </iframe>
+                            </div>
                         </section>
 
-                        <!-- Reviews -->
                         <section class="bg-gray-800 p-6 rounded-xl shadow-lg">
-                            <h2 class="text-2xl font-bold text-white mb-4 border-b-2 border-indigo-500 pb-2">Reviews</h2>
+                            <h2 class="text-2xl font-bold text-white mb-4 border-b-2 border-indigo-500 pb-2">Menu</h2>
+                            <ul id="menu-list">${menuHtml || '<p class="text-gray-400">Menu is currently unavailable.</p>'}</ul>
+                        </section>
+
+                        <section class="bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <h2 class="text-2xl font-bold text-white mb-4 border-b-2 border-indigo-500 pb-2">Write a Review</h2>
+                            <form id="write-review-form" class="space-y-4">
+                                <div class="flex flex-col items-start space-y-2">
+                                    <label class="text-gray-300">Your Rating:</label>
+                                    <div class="rating flex flex-row-reverse justify-end">
+                                        <input type="radio" id="star5" name="rating" value="5" required /><label for="star5" title="5 stars"></label>
+                                        <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"></label>
+                                        <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"></label>
+                                        <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"></label>
+                                        <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"></label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="comment" class="block text-sm font-medium text-gray-300 mb-1">Your Comment</label>
+                                    <textarea id="comment" rows="4" class="w-full p-3 text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="Share your experience..."></textarea>
+                                </div>
+                                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md">Submit Review</button>
+                                <p id="review-message" class="text-center mt-2 h-5"></p>
+                            </form>
+                        </section>
+
+                        <section class="bg-gray-800 p-6 rounded-xl shadow-lg">
+                            <h2 class="text-2xl font-bold text-white mb-4 border-b-2 border-indigo-500 pb-2">All Reviews</h2>
                             <div id="reviews-list">${reviewsHtml}</div>
                         </section>
                     </div>
 
-                    <!-- Right Side (Reservation) -->
-                    <div class="lg:col-span-1">
+                    <div class="lg:col-span-1 space-y-8">
                         <aside class="bg-gray-800 p-6 rounded-xl shadow-lg sticky top-24">
+                            <h2 class="text-2xl font-bold text-white mb-4 border-b-2 border-indigo-500 pb-2">Contact & Info</h2>
+                            <ul class="space-y-3">
+                                <li class="flex items-start text-gray-300">
+                                    <svg class="w-5 h-5 mr-3 mt-1 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0L6.343 16.657a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    <span>${data.address || 'Address not listed'}</span>
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <svg class="w-5 h-5 mr-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                    <a href="tel:${data.phone}" class="hover:text-white transition">${data.phone || 'N/A'}</a>
+                                </li>
+                                <li class="flex items-center text-gray-300">
+                                    <svg class="w-5 h-5 mr-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                    <a href="${data.website}" target="_blank" class="hover:text-white transition">${(data.website || 'N/A').replace('http://', '')}</a>
+                                </li>
+                            </ul>
+                        </aside>
+                        
+                        <aside class="bg-gray-800 p-6 rounded-xl shadow-lg">
                             <h2 class="text-2xl font-bold text-white mb-4">Make a Reservation</h2>
                             <form id="reservation-form" class="space-y-4">
                                 <div>
@@ -180,14 +298,70 @@
                 </div>
             `;
             
-            // --- Attach Event Listener for the reservation form ---
+            // Form 
             const reservationForm = document.getElementById('reservation-form');
-            reservationForm.addEventListener('submit', handleReservationSubmit);
+            if (reservationForm) {
+                reservationForm.addEventListener('submit', handleReservationSubmit);
+            }
+
+            const reviewForm = document.getElementById('write-review-form');
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', handleReviewSubmit);
+            }
         };
 
+
         /**
-         * Handles the reservation form submission by sending data to the API.
-         * @param {Event} e - The form submission event.
+         * Dinamic Or Offline send message function
+         */
+        const handleReviewSubmit = async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const messageEl = document.getElementById('review-message');
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            const ratingInput = form.querySelector('input[name="rating"]:checked');
+            const comment = document.getElementById('comment').value.trim();
+            const restaurantName = getRestaurantNameFromURL();
+
+            if (!ratingInput || !comment) {
+                messageEl.textContent = 'Please provide a rating and a comment.';
+                messageEl.className = 'text-center mt-2 h-5 text-red-400';
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Sending...';
+            messageEl.textContent = ''; 
+            
+            const reviewData = {
+                restaurantName: restaurantName,
+                rating: parseInt(ratingInput.value),
+                comment: comment
+            };
+
+            const result = await fetchData('reviews', {
+                method: 'POST',
+                body: JSON.stringify(reviewData)
+            });
+
+            submitButton.disabled = false;
+            submitButton.textContent = 'Submit Review';
+
+            if (result.error) {
+                // API bağlantı hatası durumunda MOCK mesaj göster
+                messageEl.textContent = `Review submitted (Offline). API failed!!!: ${result.message.substring(0, 50)}...`;
+                messageEl.className = 'text-center mt-2 h-5 text-yellow-400';
+            } else {
+                messageEl.textContent = 'Review submitted successfully!';
+                messageEl.className = 'text-center mt-2 h-5 text-green-400';
+                form.reset();
+            }
+        };
+
+
+        /**
+         * Dinamic Mock If API Working It will show api message if no it will show offline
          */
         const handleReservationSubmit = async (e) => {
             e.preventDefault();
@@ -195,58 +369,64 @@
             const messageEl = document.getElementById('form-message');
             const submitButton = form.querySelector('button[type="submit"]');
 
-            submitButton.disabled = true;
-            submitButton.textContent = 'Submitting...';
-            messageEl.textContent = '';
-            
-            // In a real app, userId would come from an authentication token or session
-            const userId = localStorage.getItem('userId') || 'user123'; 
+            const people = document.getElementById('people').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
             const restaurantName = getRestaurantNameFromURL();
 
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+            messageEl.textContent = ''; 
+            
             const reservationData = {
-                restaurantName,
-                userId,
-                people: document.getElementById('people').value,
-                date: document.getElementById('date').value,
-                time: document.getElementById('time').value,
+                restaurantName: restaurantName,
+                people: parseInt(people),
+                date: date,
+                time: time
             };
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/reservations`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(reservationData),
-                });
+            const result = await fetchData('reservations', {
+                method: 'POST',
+                body: JSON.stringify(reservationData)
+            });
 
-                const result = await response.json();
+            submitButton.disabled = false;
+            submitButton.textContent = 'Book a Table';
 
-                if (!response.ok) {
-                    throw new Error(result.message || 'Booking failed. Please try again.');
-                }
-
-                messageEl.textContent = result.message || 'Reservation successful!';
+            if (result.error) {
+                // if there is an api error show demo mode
+                messageEl.textContent = `Reservation recorded Offline Mode. API failed: ${result.message.substring(0, 50)}...`;
+                messageEl.className = 'text-center mt-2 h-5 text-yellow-400';
+            } else {
+                messageEl.textContent = 'Reservation successful (API)!';
                 messageEl.className = 'text-center mt-2 h-5 text-green-400';
                 form.reset();
-
-            } catch (error) {
-                console.error('Reservation Error:', error);
-                messageEl.textContent = error.message || 'An error occurred. Check console.';
-                messageEl.className = 'text-center mt-2 h-5 text-red-400';
-            } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = 'Book a Table';
             }
         };
 
-        // --- Page Initializer ---
+        // --- Page Initializer  ---
         document.addEventListener('DOMContentLoaded', async () => {
             const restaurantName = getRestaurantNameFromURL();
             
+            if (!restaurantName) {
+                // If there is an error show error
+                if (loadingIndicator) {
+                     loadingIndicator.style.display = 'none'; 
+                }
+                mainContentEl.innerHTML = `<p class="text-center text-red-400 text-xl font-bold mt-10">Error: No restaurant selected.</p>`;
+                return;
+            }
+
+            // Take Info
             const data = await fetchRestaurantDetails(restaurantName);
-            loadingIndicator.style.display = 'none'; // Hide loader
+            
+           
+            if (loadingIndicator) { 
+                loadingIndicator.style.display = 'none'; // Hide Loader
+            }
+            
             renderPage(data);
         });
     </script>
 </body>
 </html>
-

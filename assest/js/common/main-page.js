@@ -73,6 +73,99 @@ const initAndLoadData = () => {
     fetchData(url);
 };
 
+const chatIcon = document.getElementById('chat-icon');
+    
+    if (chatIcon) {
+        // Create Ballon To Ask Do you have a question
+        const bubble = document.createElement('div');
+        // Tailwind Classes
+        bubble.className = "fixed bottom-24 right-20 bg-white text-gray-800 px-4 py-2 rounded-xl shadow-2xl border border-gray-200 text-sm font-bold z-50 transform scale-0 origin-bottom-right transition-transform duration-500 ease-out";
+        bubble.innerHTML = "Do you need help? 👋"; 
+        
+       
+        const arrow = document.createElement('div');
+        arrow.className = "absolute -bottom-1 right-4 w-3 h-3 bg-white border-b border-r border-gray-200 transform rotate-45";
+        bubble.appendChild(arrow);
+        
+        document.body.appendChild(bubble);
+
+        // Shaking Animation
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes shake-hard {
+                0% { transform: rotate(0deg); }
+                25% { transform: rotate(15deg); }
+                50% { transform: rotate(0deg); }
+                75% { transform: rotate(-15deg); }
+                100% { transform: rotate(0deg); }
+            }
+            .animate-shake-hard {
+                animation: shake-hard 0.4s ease-in-out infinite;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // It will work after 3 Seconds
+        setTimeout(() => {
+            // show ballon
+            bubble.classList.remove('scale-0');
+            
+            // shake
+            chatIcon.classList.remove('animate-bounce'); 
+            chatIcon.classList.add('animate-shake-hard');
+            
+            // It will stop to shake after 2 seconds
+            setTimeout(() => {
+                chatIcon.classList.remove('animate-shake-hard');
+            }, 2000);
+
+        }, 3000);
+    }
+
+ const liveCounter = document.getElementById('live-counter');
+
+    async function fetchActiveUsers() {
+        if (!liveCounter) return;
+
+        try {
+            // --- For api connection (active member number) ---
+            /*
+            const response = await fetch('https://api.menumaster.com/v1/active-users');
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            const userCount = data.count; 
+            */
+
+            const userCount = await new Promise((resolve) => {
+                setTimeout(() => {
+                    // real number
+                    let current = parseInt(liveCounter.innerText) || 100;
+                    // For to make its crowded make it more
+                    let change = Math.floor(Math.random() * 15) - 5; 
+                    let newVal = current + change;
+                    if (newVal < 50) newVal = 50; // Min Limitr
+                    resolve(newVal);
+                }, 800); 
+            });
+
+            liveCounter.innerText = userCount;
+            
+            // If User Number is growin it will be green otherway red
+            liveCounter.parentElement.classList.add('scale-110');
+            setTimeout(() => liveCounter.parentElement.classList.remove('scale-110'), 200);
+
+        } catch (error) {
+            console.error("API Hatası:", error);
+            // If there is an error it will be empty or old number
+        }
+    }
+
+    // Pull when refresh page
+    fetchActiveUsers();
+
+    // Check Server every 10 Minutes (Polling)
+    setInterval(fetchActiveUsers, 10000);
+
 /**
  * Fetches filtered data from the API based on search form values.
  */
@@ -119,3 +212,4 @@ window.addEventListener('scroll', checkScroll);
 
 // Start fetching data when the page loads
 initAndLoadData();
+

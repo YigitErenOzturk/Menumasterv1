@@ -39,6 +39,19 @@
         </div>
     </nav>
 
+    <section class="text-center py-16 mb-12 bg-gray-800 rounded-2xl shadow-2xl relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 opacity-90 rounded-2xl"></div>
+
+    <div class="relative z-10">
+                <!-- EKLEME 2: CANLI SAYAÇ -->
+                <div class="inline-flex items-center mb-6 px-4 py-1.5 rounded-full bg-indigo-900/50 border border-indigo-500/30 text-indigo-300 text-sm font-semibold animate-pulse-slow">
+                    <span class="relative flex h-3 w-3 mr-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
+                    </span>
+                    <span id="live-counter">-</span>&nbsp;people are looking for food right now
+                </div>
+
     <div class="max-w-7xl mx-auto p-4 md:p-8">
 
         <section class="text-center py-16 mb-12 bg-gray-800 rounded-2xl shadow-2xl relative overflow-hidden">
@@ -102,7 +115,7 @@
 
         <section class="mb-12 p-8 bg-indigo-900/30 rounded-xl shadow-2xl border border-indigo-700">
             <h2 class="text-3xl font-bold text-indigo-300 mb-4">Are You a Restaurant Owner?</h2>
-            <p class="text-gray-300 mb-6 max-w-2xl">
+            <p class="text-gray-300 mb-6 max-w-2xl mx-auto">
                 Automate your reservation management, reduce your phone traffic, and reach new customers. Save time with the MenuMaster smart IVR system.
             </p>
             <a href="../restaurantfiles/signup-restaurant.html" class="inline-block px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg">
@@ -158,6 +171,9 @@
             <input type="text" id="chat-input" placeholder="Write A Message.....">
             <button id="send-btn">Send</button>
         </div>
+
+
+        
     </div>
 
     <script src="../assest/js/common/main-page.js" defer></script>
