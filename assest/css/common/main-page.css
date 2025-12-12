@@ -15,3 +15,53 @@ body {
 ::-webkit-scrollbar-track {
     background: #111827; /* Gray-900 */
 }
+/* Weather sidebar styles */
+#wm-weather-sidebar {
+  position: fixed;
+  right: 12px; /* change to left:12px; if you prefer left side */
+  top: 80px;
+  width: 220px;
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  padding: 10px;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  font-family: Arial, Helvetica, sans-serif;
+  z-index: 9999;
+}
+#wm-weather-sidebar .wm-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:13px;
+  margin-bottom:8px;
+}
+#wm-weather-sidebar .wm-card {
+  min-height:110px;
+}
+.wm-loading { text-align:center; opacity:0.8; }
+.wm-content.hidden, .wm-error.hidden { display:none; }
+.wm-content { display:block; }
+.wm-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.wm-city { font-weight:700; font-size:14px; }
+.wm-temp { font-size:18px; font-weight:700; }
+.wm-middle { display:flex; gap:8px; align-items:center; margin-bottom:6px; }
+.wm-middle img { width:48px; height:48px; }
+.wm-desc { font-size:13px; text-transform:capitalize; }
+.wm-bottom { display:flex; justify-content:space-between; font-size:12px; opacity:0.95; }
+.wm-footer { display:flex; justify-content:center; gap:8px; margin-top:8px; }
+.wm-footer button {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: #fff;
+  padding:6px 8px;
+  border-radius:6px;
+  cursor:pointer;
+}
+.wm-footer button:hover { background: rgba(255,255,255,0.14); }
+
+/* Responsive: hide on small screens */
+@media (max-width:700px) {
+  #wm-weather-sidebar { display:none; }
+}
