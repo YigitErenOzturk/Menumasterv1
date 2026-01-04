@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             {
                 keywords: ["contact", "support", "help", "phone", "email", "problem"],
-                response: "Need human support? Reach us at **support@menumaster.com** or call our hotline at **+1-800-MENU-MSTR**."
+                response: "Need human support? Reach us at **support@menumaster.com**."
             },
             {
                 keywords: ["bye", "goodbye", "thanks", "thank you"],
@@ -137,7 +137,64 @@ document.addEventListener('DOMContentLoaded', () => {
             {
                 keywords: ["commands", "what can you do"],
                 response: "You can ask me about: **Registering**, **Orders**, **Support**, or just say **Hello**!"
-            }
+            },
+            {
+    keywords: ["login", "sign in", "log in", "account access"],
+    response: "You can log in by clicking the **'Login'** button at the top right. Forgot your password? No worries—we’ve got you covered 🔐"
+},
+{
+    keywords: ["forgot password", "reset password", "password help"],
+    response: "To reset your password, click **'Forgot Password'** on the login page and follow the instructions sent to your email 📧"
+},
+{
+    keywords: ["payment", "pay", "card", "cash", "apple pay", "google pay"],
+    response: "We support multiple payment methods including **Card**, **Cash**, and **Digital Wallets** for your convenience 💳"
+},
+{
+    keywords: ["cancel order", "refund", "money back"],
+    response: "Orders can be cancelled within a limited time. Visit **'My Orders'** and select the order to see cancellation options 🔄"
+},
+{
+    keywords: ["restaurant hours", "open", "close", "working hours"],
+    response: "Restaurant opening hours are listed on each restaurant’s page. Hours may vary on weekends ⏰"
+},
+{
+    keywords: ["location", "near me", "nearby", "closest"],
+    response: "Enable location access to discover the best restaurants **near you** 📍"
+},
+{
+    keywords: ["rating", "reviews", "feedback", "stars"],
+    response: "Check real customer reviews and ratings on restaurant pages to make the best choice ⭐"
+},
+{
+    keywords: ["offers", "discount", "deal", "promo", "coupon"],
+    response: "Looking for deals? Visit the **'Special Offers'** section to find discounts and promotions 🎉"
+},
+{
+    keywords: ["vegetarian", "vegan", "halal", "gluten free"],
+    response: "We support dietary preferences! Use filters to find **Vegan**, **Vegetarian**, **Halal**, or **Gluten-Free** options 🌱"
+},
+{
+    keywords: ["reservation", "book table", "table booking"],
+    response: "You can book a table directly from the restaurant page using our **Reservation System** 📅"
+},
+{
+    keywords: ["app", "mobile", "android", "ios"],
+    response: "Our mobile app is available for **Android** and **iOS**—order food anytime, anywhere 📱"
+},
+{
+    keywords: ["error", "bug", "not working", "issue"],
+    response: "Sorry about that! Please contact **support@menumaster.com** and describe the issue so we can help quickly 🛠️"
+},
+{
+    keywords: ["language", "change language", "english", "polish"],
+    response: "You can change the language from the **Settings** menu to enjoy MenuMaster in your preferred language 🌍"
+},
+{
+    keywords: ["profile", "account", "my info"],
+    response: "Manage your personal details and preferences in the **'My Profile'** section 👤"
+}
+
         ];
 
         // Find matching keyword

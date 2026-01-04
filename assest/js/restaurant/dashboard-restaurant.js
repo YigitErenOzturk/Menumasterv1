@@ -1,70 +1,127 @@
-// --- API CONFIGURATION ---
-const API_BASE_URL = 'http://192.168.1.100:3000/api/restaurant';
-// This would be dynamic, based on the logged-in restaurant user.
-// For now, it's hardcoded for demonstration.
-const RESTAURANT_ID = 'rest123'; 
+// --- CONFIGURASYON ---
+const API_CONFIG = {
+    // API.
+    BASE_URL: 'https://api.menumaster.com/v1/restaurant', 
+    RESTAURANT_ID: 'rest_12345' 
+};
 
 // --- DOM Elements ---
-const mainContentEl = document.getElementById('main-content');
-const sidebarNav = document.getElementById('sidebar-nav');
+const DOM = {
+    mainContent: document.getElementById('main-content'),
+    sidebarNav: document.getElementById('sidebar-nav'),
+    logoutButton: document.getElementById('logout-button')
+};
 
-// --- UTILITY & API FUNCTIONS ---
+// --- Helper fuctions ---
 
-/** Shows a loading spinner in the main content area */
 const showLoading = () => {
-    mainContentEl.innerHTML = `<div class="flex justify-center items-center h-full"><div class="spinner"></div></div>`;
+    DOM.mainContent.innerHTML = `<div class="flex justify-center items-center h-full"><div class="animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 border-t-transparent"></div></div>`;
 };
 
-/** Shows an error message in the main content area */
 const showError = (message) => {
-    mainContentEl.innerHTML = `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert"><strong class="font-bold">Hata!</strong><span class="block sm:inline"> ${message}</span></div>`;
+    DOM.mainContent.innerHTML = `
+        <div class="flex flex-col items-center justify-center h-full text-center p-8">
+            <svg class="w-16 h-16 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Couldnt Download</h2>
+            <p class="text-gray-600 mb-6">${message}</p>
+            <button onclick="location.reload()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">Try Again</button>
+        </div>
+    `;
 };
 
-/** Generic data fetching function */
+const escapeHtml = (text) => {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+};
+
+// --- API FUNCTIONS ---
+
 const fetchData = async (endpoint, options = {}) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/${RESTAURANT_ID}/${endpoint}`, options);
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: `HTTP Hatası! Durum: ${response.status}` }));
-            throw new Error(errorData.message);
+        const url = `${API_CONFIG.BASE_URL}/${endpoint}`;
+        const token = localStorage.getItem('authToken');
+        
+        const headers = {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` }),
+            ...options.headers
+        };
+
+        // Timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        try {
+            const response = await fetch(url, { ...options, headers, signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.warn("The session has expired.");
+                    // window.location.href = '../login.html';
+                }
+                const errorData = await response.json().catch(() => ({ message: `HTTP Error: ${response.status}` }));
+                throw new Error(errorData.message || `Server Error (${response.status})`);
+            }
+            
+            if (response.status === 204) return { success: true };
+            return await response.json();
+
+        } catch (fetchError) {
+             if (fetchError.name === 'AbortError') {
+                 throw new Error("The request has expired.");
+             }
+             throw fetchError;
         }
-        // For DELETE requests, there might not be a JSON body
-        if (response.status === 204) return { success: true }; 
-        return await response.json();
+
     } catch (error) {
-        console.error('API Yakalama Hatası:', error);
-        showError(error.message || 'Sunucuya bağlanılamadı. Lütfen ağ bağlantınızı kontrol edin.');
-        return null;
+        console.error('API Error:', error);
+        // We return null in case of an error so that the render functions can catch it. 
+        // // We are not returning mock data, we are handling the actual error.
+        return { error: true, message: error.message };
     }
 };
 
-// --- VIEW RENDERING FUNCTIONS ---
+// --- Renderers ---
 
-/** Renders the Reservations View */
 const renderReservationsView = async () => {
     showLoading();
     const data = await fetchData('reservations');
-    if (!data) return; // Stop if there was an error
     
-    const content = `
-        <h2 class="text-3xl font-bold mb-6">Gelen Rezervasyonlar</h2>
-        <div class="bg-white p-6 rounded-lg shadow-md">
+    // Show the interface even if there's an API error, embed the error message inside.
+    const reservations = (data && !data.error) ? (data.reservations || []) : [];
+    
+   // If there's an error and the list is empty, we can show an empty list instead of a general error and notify the user. 
+   // // Or we can fill the entire screen with showError. I'm showing the list because you want to access the interface.
+
+    DOM.mainContent.innerHTML = `
+        <h2 class="text-3xl font-bold mb-6 text-gray-800"> Reservations</h2>
+        
+        ${data && data.error ? `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert"><strong class="font-bold">Error!</strong> <span class="block sm:inline">${data.message}</span></div>` : ''}
+
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
             <ul class="space-y-4">
-                ${data.reservations.length === 0 ? '<p class="text-gray-500">Bekleyen rezervasyon bulunmuyor.</p>' : data.reservations.map(r => `
-                    <li class="p-4 border rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center ${r.status === 'Confirmed' ? 'bg-green-50' : r.status === 'Declined' ? 'bg-red-50' : ''}">
+                ${reservations.length === 0 ? '<p class="text-gray-500 text-center py-8">No Any Reservation.</p>' : reservations.map(r => `
+                    <li class="p-4 border rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center transition hover:shadow-sm">
                         <div>
-                            <p class="font-bold text-lg">${r.user.name}</p>
-                            <p class="text-gray-600">${r.people} kişi, ${new Date(r.date).toLocaleDateString()} tarihinde, saat ${r.time}</p>
+                            <p class="font-bold text-lg text-gray-800">${escapeHtml(r.user?.name || 'Guest')}</p>
+                            <p class="text-gray-600 text-sm flex items-center mt-1">
+                                <span class="mr-3">👥 ${r.people} Person</span>
+                                <span>📅 ${new Date(r.date).toLocaleDateString()} 🕒 ${r.time}</span>
+                            </p>
                         </div>
                         <div class="flex items-center space-x-2 mt-3 sm:mt-0">
-                            <span class="px-3 py-1 text-sm font-semibold rounded-full ${
-                                r.status === 'Confirmed' ? 'bg-green-200 text-green-800' :
-                                r.status === 'Declined' ? 'bg-red-200 text-red-800' :
-                                'bg-yellow-200 text-yellow-800'
-                            }">${r.status}</span>
+                            <span class="px-3 py-1 text-xs font-bold uppercase rounded-full bg-gray-100 text-gray-800">${r.status}</span>
                             ${r.status === 'Pending' ? `
-                            <button data-id="${r.id}" data-action="confirm" class="reservation-action bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded">Onayla</button>
-                            <button data-id="${r.id}" data-action="decline" class="reservation-action bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded">Reddet</button>
+                            <div class="flex space-x-1 ml-2">
+                                <button onclick="updateReservation('${r.id}', 'Confirmed')" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded transition">Accept</button>
+                                <button onclick="updateReservation('${r.id}', 'Declined')" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded transition">Decline</button>
+                            </div>
                             ` : ''}
                         </div>
                     </li>
@@ -72,113 +129,115 @@ const renderReservationsView = async () => {
             </ul>
         </div>
     `;
-    mainContentEl.innerHTML = content;
 };
 
-/** Renders the Menu Management View */
 const renderMenuView = async () => {
     showLoading();
     const data = await fetchData('menu');
-    if (!data) return;
+    const menuItems = (data && !data.error) ? (data.menu || []) : [];
 
-    const content = `
-        <h2 class="text-3xl font-bold mb-6">Menü Yönetimi</h2>
+    DOM.mainContent.innerHTML = `
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">Menu Manager</h2>
+        
+        ${data && data.error ? `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">${data.message}</div>` : ''}
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-semibold mb-4">Mevcut Menü</h3>
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                <h3 class="text-xl font-semibold mb-4 border-b pb-2">Foods</h3>
                 <ul id="menu-list" class="space-y-3">
-                ${data.menu.length === 0 ? '<p class="text-gray-500">Menünüz boş.</p>' : data.menu.map(item => `
-                    <li class="p-3 border rounded-lg flex justify-between items-center">
+                ${menuItems.length === 0 ? '<p class="text-gray-500 italic text-center py-4">Menu Is Empty Or Couldnt Download.</p>' : menuItems.map(item => `
+                    <li class="p-4 border rounded-lg flex justify-between items-center hover:bg-gray-50 transition">
                         <div>
-                            <p class="font-bold">${item.name}</p>
-                            <p class="text-sm text-gray-500">${item.description}</p>
+                            <p class="font-bold text-gray-800">${escapeHtml(item.name)}</p>
+                            <p class="text-sm text-gray-500">${escapeHtml(item.description)}</p>
                         </div>
-                        <div class="flex items-center space-x-3">
-                            <span class="font-semibold text-indigo-600">${item.price} PLN</span>
-                            <button data-id="${item.id}" class="delete-item-btn text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
+                        <div class="flex items-center space-x-4">
+                            <span class="font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">${item.price} PLN</span>
+                            <button onclick="deleteMenuItem('${item.id}')" class="text-gray-400 hover:text-red-500 transition">Sil</button>
                         </div>
                     </li>
                 `).join('')}
                 </ul>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-semibold mb-4">Yeni Ürün Ekle</h3>
+            
+            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 h-fit sticky top-6">
+                <h3 class="text-xl font-semibold mb-4 text-indigo-600">Add New</h3>
                 <form id="add-menu-item-form" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Ürün Adı</label>
-                        <input name="name" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500" required>
-                    </div>
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Fiyat (PLN)</label>
-                        <input name="price" type="number" step="0.01" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                        <label class="block text-sm font-medium text-gray-700">Name</label>
+                        <input name="name" type="text" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Açıklama</label>
-                        <textarea name="description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500" required></textarea>
+                        <label class="block text-sm font-medium text-gray-700">Price (PLN)</label>
+                        <input name="price" type="number" step="0.5" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5" required>
                     </div>
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Menüye Ekle</button>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Decription</label>
+                        <textarea name="description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5" required></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-lg transition shadow-md">Add</button>
                 </form>
             </div>
         </div>
     `;
-    mainContentEl.innerHTML = content;
+    
+    const form = document.getElementById('add-menu-item-form');
+    if(form) form.addEventListener('submit', handleAddMenuSubmit);
 };
 
-/** Renders the Reviews View */
 const renderReviewsView = async () => {
-     showLoading();
-     const data = await fetchData('reviews');
-     if (!data) return;
-     
-     const content = `
-        <h2 class="text-3xl font-bold mb-6">Müşteri Yorumları</h2>
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <ul class="space-y-5">
-                ${data.reviews.length === 0 ? '<p class="text-gray-500">Henüz yorum yapılmamış.</p>' : data.reviews.map(r => `
-                     <li class="p-4 border-b">
-                        <div class="flex justify-between items-center">
-                            <p class="font-bold">${r.user.name}</p>
-                            <div class="flex items-center">
-                            ${[...Array(5)].map((_, i) => `<svg class="w-5 h-5 ${i < r.rating ? 'text-yellow-400' : 'text-gray-300'}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`).join('')}
-                            </div>
+    showLoading();
+    const data = await fetchData('reviews');
+    const reviews = (data && !data.error) ? (data.reviews || []) : [];
+    
+    DOM.mainContent.innerHTML = `
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">Customer Comments</h2>
+        
+        ${data && data.error ? `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">${data.message}</div>` : ''}
+
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+            <div class="space-y-6">
+                ${reviews.length === 0 ? '<p class="text-gray-500 text-center py-4">No Comments Yet.</p>' : reviews.map(r => `
+                    <div class="p-4 border-b last:border-0 hover:bg-gray-50 transition rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-gray-800">${escapeHtml(r.userName || 'Anonim')}</span>
+                            <div class="flex text-yellow-400">Rating: ${r.rating}/5</div>
                         </div>
-                        <p class="text-gray-600 mt-2 italic">"${r.comment}"</p>
-                    </li>
+                        <p class="text-gray-600 italic">"${escapeHtml(r.comment)}"</p>
+                    </div>
                 `).join('')}
-            </ul>
+            </div>
         </div>
     `;
-    mainContentEl.innerHTML = content;
 };
 
 const renderTicketsView = async () => {
     showLoading();
     const data = await fetchData('tickets');
-    if (!data) return;
+    const tickets = (data && !data.error) ? (data.tickets || []) : [];
 
-    mainContentEl.innerHTML = `
-        <h2 class="text-3xl font-bold mb-6 text-white">Support Tickets</h2>
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    DOM.mainContent.innerHTML = `
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">Support Tickets</h2>
+        
+        ${data && data.error ? `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">${data.message}</div>` : ''}
+
+        <div class="bg-white p-6 rounded-lg shadow-lg">
             <table class="w-full text-left">
                  <thead>
                     <tr class="border-b border-gray-700">
-                        <th class="p-3">Ticket ID</th>
-                        <th class="p-3">User</th>
+                        <th class="p-3">ID</th>
                         <th class="p-3">Subject</th>
                         <th class="p-3">Status</th>
-                        <th class="p-3">Last Updated</th>
-                        <th class="p-3">Action</th>
+                        <th class="p-3">Date</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${data.tickets.map(t => `
-                        <tr class="border-b border-gray-700 hover:bg-gray-700/50">
-                            <td class="p-3 font-mono text-xs text-gray-400">${t.id}</td>
-                            <td class="p-3">${t.user.name}</td>
-                            <td class="p-3 font-medium">${t.subject}</td>
-                            <td class="p-3"><span class="px-3 py-1 text-xs font-semibold rounded-full ${t.status === 'Open' ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-300'}">${t.status}</span></td>
-                            <td class="p-3">${new Date(t.lastUpdate).toLocaleString()}</td>
-                            <td class="p-3"><button data-id="${t.id}" class="view-ticket-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded-md transition">View</button></td>
+                    ${tickets.length === 0 ? '<tr><td colspan="4" class="p-3 text-center text-gray-500">Couldnt Find.</td></tr>' : tickets.map(t => `
+                        <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="p-3 font-mono text-xs text-gray-600">${t.id}</td>
+                            <td class="p-3 font-medium">${escapeHtml(t.subject)}</td>
+                            <td class="p-3">${t.status}</td>
+                            <td class="p-3">${new Date(t.createdAt).toLocaleDateString()}</td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -187,111 +246,123 @@ const renderTicketsView = async () => {
     `;
 };
 
-/** Renders the Settings View */
 const renderSettingsView = async () => {
     showLoading();
-    const data = await fetchData('settings');
-    if (!data) return;
+    const data = await fetchData(API_CONFIG.ENDPOINTS.ME);
+    const settings = (data && !data.error) ? (data.restaurant || data) : {};
 
-    const content = `
-        <h2 class="text-3xl font-bold mb-6">Restoran Ayarları</h2>
-        <div class="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto">
-            <form id="settings-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Restoran Adı</label>
-                    <input name="name" type="text" value="${data.settings.name}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+    DOM.mainContent.innerHTML = `
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">Restoran Settings</h2>
+        
+        ${data && data.error ? `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">${data.message}</div>` : ''}
+
+        <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200 max-w-2xl mx-auto">
+            <form id="settings-form" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Restoran Name</label>
+                        <input name="name" type="text" value="${escapeHtml(settings.name || '')}" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Telefon</label>
+                        <input name="phone" type="text" value="${escapeHtml(settings.phone || '')}" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5">
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Adres</label>
-                    <input name="address" type="text" value="${data.settings.address}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                    <label class="block text-sm font-medium text-gray-700">Adress</label>
+                    <input name="address" type="text" value="${escapeHtml(settings.address || '')}" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Mutfak Türü</label>
-                    <input name="cuisine" type="text" value="${data.settings.cuisine}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                    <label class="block text-sm font-medium text-gray-700">Type</label>
+                    <input name="cuisine" type="text" value="${escapeHtml(settings.cuisine || '')}" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Telefon Numarası</label>
-                    <input name="phone" type="text" value="${data.settings.phone}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md">Save</button>
                 </div>
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Değişiklikleri Kaydet</button>
             </form>
         </div>
     `;
-    mainContentEl.innerHTML = content;
+    
+    const form = document.getElementById('settings-form');
+    if(form) form.addEventListener('submit', handleSettingsSubmit);
 };
 
-// --- EVENT HANDLERS ---
+// --- ACTION HANDLERS ---
 
-const handleMainContentClick = async (e) => {
-    if (e.target.matches('.reservation-action')) {
-        const button = e.target;
-        const reservationId = button.dataset.id;
-        const action = button.dataset.action;
-        
-        button.disabled = true;
-        button.textContent = '...';
-
-        const result = await fetchData(`reservations/${reservationId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: action === 'confirm' ? 'Confirmed' : 'Declined' })
-        });
-        if (result) renderReservationsView();
-    }
+window.updateReservation = async (id, status) => {
+    if(!confirm(`Are you sure to do (${status}) that?`)) return;
     
-    if (e.target.matches('.delete-item-btn')) {
-        const button = e.target;
-        const itemId = button.dataset.id;
-        if (confirm('Bu ürünü silmek istediğinizden emin misiniz?')) {
-             const result = await fetchData(`menu/${itemId}`, { method: 'DELETE' });
-             if (result) renderMenuView();
+    const result = await fetchData(`${API_CONFIG.ENDPOINTS.RESERVATIONS}/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: status })
+    });
+    
+    if (result && !result.error) {
+        alert('Completed!');
+        renderReservationsView();
+    } else {
+        alert('Unsuccessful: ' + (result?.message || 'error'));
+    }
+};
+
+window.deleteMenuItem = async (id) => {
+    if(confirm('Are you sure to delete?')) {
+        const result = await fetchData(`${API_CONFIG.ENDPOINTS.MENU}/${id}`, { method: 'DELETE' });
+        if (result && !result.error) {
+            alert('Deleted!');
+            renderMenuView();
+        } else {
+             alert('Deleted: ' + (result?.message || 'Error'));
         }
     }
 };
 
-const handleMainContentSubmit = async (e) => {
-     e.preventDefault();
-
-     if (e.target.id === 'add-menu-item-form') {
-         const form = e.target;
-         const formData = new FormData(form);
-         const newItem = Object.fromEntries(formData.entries());
-         
-         const result = await fetchData('menu', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify(newItem)
-         });
-         if (result) renderMenuView();
-     }
-     
-     if (e.target.id === 'settings-form') {
-         const form = e.target;
-         const formData = new FormData(form);
-         const updatedSettings = Object.fromEntries(formData.entries());
-
-         const result = await fetchData('settings', {
-             method: 'PUT',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify(updatedSettings)
-         });
-         if (result) {
-            alert('Ayarlar kaydedildi!');
-            renderSettingsView();
-         }
-     }
+const handleAddMenuSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const newItem = Object.fromEntries(formData.entries());
+    
+    const result = await fetchData('menu', {
+        method: 'POST',
+        body: JSON.stringify(newItem)
+    });
+    
+    if (result && !result.error) {
+        alert('Added!');
+        renderMenuView();
+    } else {
+        alert('Unsuccesfull: ' + (result?.message || 'Error'));
+    }
 };
 
-// --- Router & Navigation ---
+const handleSettingsSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const updatedSettings = Object.fromEntries(formData.entries());
+    
+    const result = await fetchData(API_CONFIG.ENDPOINTS.ME, {
+        method: 'PUT',
+        body: JSON.stringify(updatedSettings)
+    });
+    
+    if (result && !result.error) {
+        alert('Updatd!');
+        renderSettingsView(); 
+    } else {
+        alert('Update Unsuccesfull: ' + (result?.message || 'Error'));
+    }
+};
+
+// --- ROUTER ---
 const handleNavigation = (e) => {
-    if (!e.target.closest('.sidebar-link')) return;
+    const link = e.target.closest('.sidebar-link');
+    if (!link) return;
     e.preventDefault();
 
-    const link = e.target.closest('.sidebar-link');
     const targetId = link.getAttribute('href').substring(1);
 
-    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-    link.classList.add('active');
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active', 'bg-indigo-50', 'text-indigo-600'));
+    link.classList.add('active', 'bg-indigo-50', 'text-indigo-600');
     
     switch (targetId) {
         case 'reservations': renderReservationsView(); break;
@@ -299,14 +370,26 @@ const handleNavigation = (e) => {
         case 'reviews': renderReviewsView(); break;
         case 'tickets': renderTicketsView(); break;
         case 'settings': renderSettingsView(); break;
+        default: renderReservationsView();
     }
 };
 
-// --- Initial Load ---
+const handleLogout = (e) => {
+    e.preventDefault();
+    if(confirm('Are you sure to exit?')) {
+        localStorage.clear();
+        window.location.href = '../commonfiles/main-page.html';
+    }
+};
+
+// --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
-    sidebarNav.addEventListener('click', handleNavigation);
-    mainContentEl.addEventListener('click', handleMainContentClick);
-    mainContentEl.addEventListener('submit', handleMainContentSubmit);
+    if(DOM.sidebarNav) DOM.sidebarNav.addEventListener('click', handleNavigation);
     
+    if(DOM.logoutButton) {
+        DOM.logoutButton.addEventListener('click', handleLogout);
+    }
+    
+    //Load reservations by default.
     renderReservationsView();
 });
