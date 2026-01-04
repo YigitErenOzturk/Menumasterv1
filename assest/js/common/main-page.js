@@ -155,7 +155,7 @@ const chatIcon = document.getElementById('chat-icon');
             setTimeout(() => liveCounter.parentElement.classList.remove('scale-110'), 200);
 
         } catch (error) {
-            console.error("API Hatası:", error);
+            console.error("Error:", error);
             // If there is an error it will be empty or old number
         }
     }
