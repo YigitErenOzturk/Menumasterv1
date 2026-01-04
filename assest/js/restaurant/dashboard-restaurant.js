@@ -1,8 +1,15 @@
 // --- CONFIGURASYON ---
 const API_CONFIG = {
     // API.
-    BASE_URL: 'https://api.menumaster.com/v1/restaurant', 
-    RESTAURANT_ID: 'rest_12345' 
+    BASE_URL: 'http://localhost:5000/api', 
+    CATEGORIES: ['Starter', 'Main Course', 'Drinks', 'Desserts', 'Salads'],
+    ENDPOINTS: {
+        MENU: 'restaurants/menu',
+        RESERVATIONS: 'restaurants/reservations',
+        REVIEWS: 'restaurants/reviews',
+        TICKETS: 'restaurants/tickets',
+        ME: 'restaurants/me' // Restoran ayarları için
+    }
 };
 
 // --- DOM Elements ---
@@ -45,16 +52,17 @@ const fetchData = async (endpoint, options = {}) => {
     try {
         const url = `${API_CONFIG.BASE_URL}/${endpoint}`;
         const token = localStorage.getItem('authToken');
+        console.log("Giden URL:", `${API_CONFIG.BASE_URL}/${endpoint}`);
+        console.log("Header'a eklenen Token:", token ? `Bearer ${token.substring(0, 15)}...` : "TOKEN BULUNAMADI!");
         
         const headers = {
             'Content-Type': 'application/json',
-            ...(token && { 'Authorization': `Bearer ${token}` }),
+            ...(token && { 'Authorization': `Bearer ${token}` }), // Token varsa ekler
             ...options.headers
         };
 
-        // Timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // Azure SQL yavaş olabilir, 8sn yaptık
 
         try {
             const response = await fetch(url, { ...options, headers, signal: controller.signal });
@@ -62,30 +70,27 @@ const fetchData = async (endpoint, options = {}) => {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    console.warn("The session has expired.");
-                    // window.location.href = '../login.html';
+                    console.warn("Oturum süresi doldu.");
+                    // localStorage.removeItem('authToken');
+                    // window.location.href = '../login.html'; // Girişe yönlendir
+                    // return;
                 }
-                const errorData = await response.json().catch(() => ({ message: `HTTP Error: ${response.status}` }));
-                throw new Error(errorData.message || `Server Error (${response.status})`);
+                const errorData = await response.json().catch(() => ({ message: `HTTP Hata: ${response.status}` }));
+                throw new Error(errorData.message || `Sunucu Hatası (${response.status})`);
             }
             
             if (response.status === 204) return { success: true };
             return await response.json();
 
         } catch (fetchError) {
-             if (fetchError.name === 'AbortError') {
-                 throw new Error("The request has expired.");
-             }
+             if (fetchError.name === 'AbortError') throw new Error("İstek zaman aşımına uğradı.");
              throw fetchError;
         }
-
     } catch (error) {
         console.error('API Error:', error);
-        // We return null in case of an error so that the render functions can catch it. 
-        // // We are not returning mock data, we are handling the actual error.
         return { error: true, message: error.message };
     }
-};
+}
 
 // --- Renderers ---
 
@@ -133,49 +138,67 @@ const renderReservationsView = async () => {
 
 const renderMenuView = async () => {
     showLoading();
-    const data = await fetchData('menu');
+    const data = await fetchData(API_CONFIG.ENDPOINTS.MENU);
     const menuItems = (data && !data.error) ? (data.menu || []) : [];
+
+    // Veriyi kategorilere göre gruplayalım
+    const groupedMenu = menuItems.reduce((acc, item) => {
+        const cat = item.category || 'Other';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(item);
+        return acc;
+    }, {});
 
     DOM.mainContent.innerHTML = `
         <h2 class="text-3xl font-bold mb-6 text-gray-800">Menu Manager</h2>
         
-        ${data && data.error ? `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">${data.message}</div>` : ''}
-
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                <h3 class="text-xl font-semibold mb-4 border-b pb-2">Foods</h3>
-                <ul id="menu-list" class="space-y-3">
-                ${menuItems.length === 0 ? '<p class="text-gray-500 italic text-center py-4">Menu Is Empty Or Couldnt Download.</p>' : menuItems.map(item => `
-                    <li class="p-4 border rounded-lg flex justify-between items-center hover:bg-gray-50 transition">
-                        <div>
-                            <p class="font-bold text-gray-800">${escapeHtml(item.name)}</p>
-                            <p class="text-sm text-gray-500">${escapeHtml(item.description)}</p>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <span class="font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">${item.price} PLN</span>
-                            <button onclick="deleteMenuItem('${item.id}')" class="text-gray-400 hover:text-red-500 transition">Sil</button>
-                        </div>
-                    </li>
+            <div class="lg:col-span-2 space-y-8">
+                ${Object.keys(groupedMenu).length === 0 ? '<p class="text-gray-500 italic">Menu is empty.</p>' : 
+                    Object.entries(groupedMenu).map(([category, items]) => `
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                        <h3 class="text-xl font-bold mb-4 text-indigo-600 border-b pb-2 uppercase tracking-wide">${category}</h3>
+                        <ul class="space-y-3">
+                            ${items.map(item => `
+                                <li class="p-4 border rounded-lg flex justify-between items-center hover:bg-gray-50 transition">
+                                    <div>
+                                        <p class="font-bold text-gray-800">${escapeHtml(item.name)}</p>
+                                        <p class="text-sm text-gray-500">${escapeHtml(item.description)}</p>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <span class="font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">${item.price} PLN</span>
+                                        <button onclick="deleteMenuItem('${item.id}')" class="text-gray-400 hover:text-red-500 transition">Delete</button>
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
                 `).join('')}
-                </ul>
             </div>
             
             <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 h-fit sticky top-6">
-                <h3 class="text-xl font-semibold mb-4 text-indigo-600">Add New</h3>
+                <h3 class="text-xl font-semibold mb-4 text-indigo-600">Add New Item</h3>
                 <form id="add-menu-item-form" class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Name</label>
                         <input name="name" type="text" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5" required>
                     </div>
                     <div>
+                        <label class="block text-sm font-medium text-gray-700">Category</label>
+                        <select name="category" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5" required>
+                            <option value="">Select Category</option>
+                            ${API_CONFIG.CATEGORIES.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
                         <label class="block text-sm font-medium text-gray-700">Price (PLN)</label>
                         <input name="price" type="number" step="0.5" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Decription</label>
+                        <label class="block text-sm font-medium text-gray-700">Description</label>
                         <textarea name="description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5" required></textarea>
                     </div>
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-lg transition shadow-md">Add</button>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-lg transition shadow-md">Add to Menu</button>
                 </form>
             </div>
         </div>
@@ -306,13 +329,14 @@ window.updateReservation = async (id, status) => {
 };
 
 window.deleteMenuItem = async (id) => {
-    if(confirm('Are you sure to delete?')) {
+    if(confirm('Bu yemeği silmek istediğinize emin misiniz?')) {
+        // Endpoint'i dinamik yaptık
         const result = await fetchData(`${API_CONFIG.ENDPOINTS.MENU}/${id}`, { method: 'DELETE' });
         if (result && !result.error) {
-            alert('Deleted!');
+            alert('Başarıyla silindi!');
             renderMenuView();
         } else {
-             alert('Deleted: ' + (result?.message || 'Error'));
+             alert('Hata: ' + (result?.message || 'Silinemedi'));
         }
     }
 };
@@ -322,16 +346,21 @@ const handleAddMenuSubmit = async (e) => {
     const formData = new FormData(e.target);
     const newItem = Object.fromEntries(formData.entries());
     
-    const result = await fetchData('menu', {
+    // Backend decimal beklediği için fiyatı sayıya çevirelim
+    newItem.price = parseFloat(newItem.price);
+    console.log('Adding Menu Item:', newItem);
+
+    const result = await fetchData(API_CONFIG.ENDPOINTS.MENU, {
         method: 'POST',
         body: JSON.stringify(newItem)
     });
     
     if (result && !result.error) {
-        alert('Added!');
+        alert('Yemek başarıyla eklendi!');
+        e.target.reset(); // Formu temizle
         renderMenuView();
     } else {
-        alert('Unsuccesfull: ' + (result?.message || 'Error'));
+        alert('Ekleme başarısız: ' + (result?.message || 'Hata oluştu'));
     }
 };
 
