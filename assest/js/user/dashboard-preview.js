@@ -395,7 +395,7 @@ const renderSettingsView = async () => {
 
         } catch (error) {
             console.error(error);
-            messageEl.textContent = 'Error updating settings. Please try again.';
+            messageEl.textContent = 'Error during updating settings , Please try again.';
             messageEl.className = 'mt-4 text-center text-red-400 font-medium';
         }
     });
