@@ -44,10 +44,11 @@
             <p class="text-center text-gray-500 mb-8 text-sm">Please enter your details to sign in.</p>
             
             <form id="login-form" class="space-y-6">
+                <!-- Username or Email Input -->
                 <div>
-                    <label for="email" class="text-sm font-bold text-gray-700">Email</label>
-                    <input id="email" name="email" type="email" autocomplete="email" required
-                           class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
+                    <label for="email" class="text-sm font-medium text-gray-300">Email</label>
+                    <input id="email" name="usernameOrEmail" type="text" autocomplete="email" required
+                           class="mt-2 w-full p-3 text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
                            placeholder="you@example.com">
                 </div>
                 <div>
@@ -59,8 +60,18 @@
                            class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
                            placeholder="••••••••">
                 </div>
-                
-                <div id="message-display" class="text-sm text-center h-5 font-medium"></div>
+                <div>
+                    <label class="flex items-center gap-2 text-gray-300 text-sm">
+                        <input
+                        type="checkbox"
+                        id="isRestaurant"
+                        class="accent-indigo-500"
+                        >
+                        Login as a Restaurant
+                    </label>
+                    </div>
+                <!-- Error/Success Message Placeholder -->
+                <div id="message-display" class="text-sm text-center h-5"></div>
 
                 <div>
                     <button type="submit"
@@ -104,6 +115,6 @@
         <p class="text-gray-500 text-sm">&copy; 2026 MenuMaster - All rights reserved.</p>
     </footer>
 
-    <script src="../assest/js/user/login.js"></script>
+    <script src="../assest/js/common/login.js"></script>
 </body>
 </html>
