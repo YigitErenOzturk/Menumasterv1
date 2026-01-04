@@ -1,67 +1,64 @@
-// --- API CONFIGURATION ---
-const API_BASE_URL = 'http://192.168.1.100:3000'; 
-// -------------------------
+// --- CONFIGURATION ---
+const API_BASE_URL = 'http://localhost:5000/api'; // Kendi local portunla değiştirmeyi unutma
 
 // DOM Elements
 const signupForm = document.getElementById('restaurant-signup-form');
-const restaurantNameInput = document.getElementById('restaurantName');
+const nameInput = document.getElementById('restaurantName'); // HTML'deki ID'n aynı kalabilir
 const addressInput = document.getElementById('address');
-const ownerNameInput = document.getElementById('ownerName');
+const descriptionInput = document.getElementById('description'); // Yeni alan
+const phoneInput = document.getElementById('phoneNumber'); // Yeni alan
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const messageEl = document.getElementById('message');
 
 /**
- * Handles the restaurant sign-up form submission.
- * @param {Event} event - The form submission event.
+ * Handles the restaurant sign-up form submission using the new API Schema.
  */
 const handleRestaurantSignup = async (event) => {
     event.preventDefault();
-    messageEl.textContent = '';
-    messageEl.className = 'text-sm text-center'; // Reset class
+    const msg = document.getElementById('message');
 
+    // Backend JSON şemasına %100 uyumlu obje
     const restaurantData = {
-        restaurantName: restaurantNameInput.value.trim(),
-        address: addressInput.value.trim(),
-        ownerName: ownerNameInput.value.trim(),
-        email: emailInput.value.trim(),
-        password: passwordInput.value.trim(),
+        name: document.getElementById('restaurantName').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value.trim(),
+        phoneNumber: document.getElementById('phoneNumber').value.trim(),
+        description: document.getElementById('description').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        imageUrl: "" // Backend string beklediği için boş string gönderiyoruz
     };
 
-    // Obligatory to fill the fields
-    if (Object.values(restaurantData).some(field => !field)) {
-        messageEl.textContent = 'Please fill in all fields.';
-        messageEl.classList.add('text-red-400');
-        return;
-    }
-
     try {
-        // Must be this '/register-restaurant' Endpoint in beckend
-        const response = await fetch(`${API_BASE_URL}/register-restaurant`, {
+        msg.textContent = 'Registering...';
+        msg.className = 'text-center text-gray-400 animate-pulse';
+
+        const response = await fetch(`${API_BASE_URL}/restaurants/Register`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(restaurantData),
         });
 
+        // Hata detayını görebilmek için önce JSON'ı parse et
         const result = await response.json();
 
         if (!response.ok) {
-            throw new Error(result.message || `HTTP Error! Status: ${response.status}`);
+            // Backend'den gelen hata detaylarını konsola bas (Neden 400 aldığını buradan göreceğiz)
+            console.error("Backend Hata Detayı:", result);
+            
+            // Eğer backend validation errors dönüyorsa onları yakala
+            const errorMessage = result.errors ? JSON.stringify(result.errors) : (result.message || `Error ${response.status}`);
+            throw new Error(errorMessage);
         }
         
-        // --- SUCCESS ---
-        messageEl.textContent = 'Restaurant registered successfully! Our team will review your application.';
-        messageEl.classList.add('text-green-400');
-        signupForm.reset(); // Clear the form
+        msg.textContent = 'Restaurant registered successfully!';
+        msg.className = 'text-center text-green-400 font-bold';
+        signupForm.reset();
 
     } catch (error) {
-        console.error("Restaurant Signup Error:", error);
-        messageEl.textContent = error.message;
-        messageEl.classList.add('text-red-400');
+        console.error("Signup Error:", error);
+        msg.textContent = "Hata: Bilgileri kontrol edip tekrar deneyin.";
+        msg.className = 'text-center text-red-400';
     }
 };
-
-// --- Event Listener ---
 signupForm.addEventListener('submit', handleRestaurantSignup);
