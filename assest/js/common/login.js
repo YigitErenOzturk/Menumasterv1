@@ -62,10 +62,17 @@ const handleLogin = async (event) => {
       throw new Error(data.message || 'Invalid credentials or server error.');
     }
 // --- ONLINE SUCCESS ---
-    console.log('Login Success:', data);
-    localStorage.setItem("userId", data.userId);
-    localStorage.setItem("userName", data.name);
-    displayMessage('Login successful! Redirecting...', 'success');
+console.log('Login Success:', data);
+
+// 1. En kritik kısım: Backend'den gelen token'ı kaydediyoruz
+if (data.token) {
+    localStorage.setItem("authToken", data.token); // dashboard-restaurant.js bu ismi bekliyor
+}
+
+localStorage.setItem("userId", data.userId || ""); 
+localStorage.setItem("userName", data.name || "");
+
+displayMessage('Login successful! Redirecting...', 'success');
 
 
     setTimeout(() => {
