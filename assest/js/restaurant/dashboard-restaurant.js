@@ -8,7 +8,7 @@ const API_CONFIG = {
         RESERVATIONS: 'restaurants/reservations',
         REVIEWS: 'restaurants/reviews',
         TICKETS: 'restaurants/tickets',
-        ME: 'restaurants/me' // Restoran ayarları için
+        ME: 'restaurants/me' // Restoran Settings
     }
 };
 
@@ -53,11 +53,11 @@ const fetchData = async (endpoint, options = {}) => {
         const url = `${API_CONFIG.BASE_URL}/${endpoint}`;
         const token = localStorage.getItem('authToken');
         console.log("Giden URL:", `${API_CONFIG.BASE_URL}/${endpoint}`);
-        console.log("Header'a eklenen Token:", token ? `Bearer ${token.substring(0, 15)}...` : "TOKEN BULUNAMADI!");
+        console.log("Header Token:", token ? `Bearer ${token.substring(0, 15)}...` : "TOKEN Could Not Find!");
         
         const headers = {
             'Content-Type': 'application/json',
-            ...(token && { 'Authorization': `Bearer ${token}` }), // Token varsa ekler
+            ...(token && { 'Authorization': `Bearer ${token}` }), // If there is a token it will add
             ...options.headers
         };
 
