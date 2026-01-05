@@ -236,8 +236,11 @@ const renderReservationsView = async () => {
   }
 
   listEl.innerHTML = reservations.map(res => {
-    // Statü renkleri
-    const statusClass = res.status === 'Confirmed' ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+    // 1. STATÜ RENKLERİNİ BURADA BELİRLİYORUZ
+    const statusClass = 
+        res.status === 'Confirmed' ? 'bg-green-500/10 text-green-400 border-green-500/20' : 
+        res.status === 'Declined' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 
+        'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'; // Pending için sarı
     
     return `
     <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-indigo-500/50 transition-colors shadow-xl">
@@ -261,12 +264,11 @@ const renderReservationsView = async () => {
         <span class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border ${statusClass}">
           ${res.status || 'Pending'}
         </span>
+        
         <button onclick="cancelReservation(${res.id})" class="ml-auto md:ml-0 text-gray-500 hover:text-red-400 p-2 transition-colors">
-  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-  </svg>
-</button>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
         </button>
       </div>
     </div>
