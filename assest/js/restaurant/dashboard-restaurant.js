@@ -1,6 +1,5 @@
 // --- CONFIGURASYON ---
 const API_CONFIG = {
-    // API.
     BASE_URL: 'http://localhost:5000/api', 
     CATEGORIES: ['Starter', 'Main Course', 'Drinks', 'Desserts', 'Salads'],
     ENDPOINTS: {
@@ -8,7 +7,7 @@ const API_CONFIG = {
         RESERVATIONS: 'restaurants/reservations',
         REVIEWS: 'restaurants/reviews',
         TICKETS: 'restaurants/tickets',
-        ME: 'restaurants/me' // Restoran ayarları için
+        ME: 'restaurants/me'
     }
 };
 
@@ -19,21 +18,9 @@ const DOM = {
     logoutButton: document.getElementById('logout-button')
 };
 
-// --- Helper fuctions ---
-
+// --- Helper functions ---
 const showLoading = () => {
     DOM.mainContent.innerHTML = `<div class="flex justify-center items-center h-full"><div class="animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 border-t-transparent"></div></div>`;
-};
-
-const showError = (message) => {
-    DOM.mainContent.innerHTML = `
-        <div class="flex flex-col items-center justify-center h-full text-center p-8">
-            <svg class="w-16 h-16 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Could not download</h2>
-            <p class="text-gray-600 mb-6">${message}</p>
-            <button onclick="location.reload()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">Try Again</button>
-        </div>
-    `;
 };
 
 const escapeHtml = (text) => {
@@ -47,45 +34,25 @@ const escapeHtml = (text) => {
 };
 
 // --- API FUNCTIONS ---
-
 const fetchData = async (endpoint, options = {}) => {
     try {
         const url = `${API_CONFIG.BASE_URL}/${endpoint}`;
         const token = localStorage.getItem('authToken');
-        console.log("Giden URL:", `${API_CONFIG.BASE_URL}/${endpoint}`);
-        console.log("Header'a eklenen Token:", token ? `Bearer ${token.substring(0, 15)}...` : "TOKEN BULUNAMADI!");
         
         const headers = {
             'Content-Type': 'application/json',
-            ...(token && { 'Authorization': `Bearer ${token}` }), // Token varsa ekler
+            ...(token && { 'Authorization': `Bearer ${token}` }),
             ...options.headers
         };
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // Azure SQL yavaş olabilir, 8sn yaptık
-
-        try {
-            const response = await fetch(url, { ...options, headers, signal: controller.signal });
-            clearTimeout(timeoutId);
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    console.warn("Oturum süresi doldu.");
-                    // localStorage.removeItem('authToken');
-                    // window.location.href = '../login.html'; // Girişe yönlendir
-                    // return;
-                }
-                const errorData = await response.json().catch(() => ({ message: `HTTP Hata: ${response.status}` }));
-                throw new Error(errorData.message || `Sunucu Hatası (${response.status})`);
-            }
-            
-            if (response.status === 204) return { success: true };
-            return await response.json();
-
-        } catch (fetchError) {
-             if (fetchError.name === 'AbortError') throw new Error("İstek zaman aşımına uğradı.");
-             throw fetchError;
+        const response = await fetch(url, { ...options, headers });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: `HTTP Error: ${response.status}` }));
+            throw new Error(errorData.message || `Server Error (${response.status})`);
         }
+        
+        if (response.status === 204) return { success: true };
+        return await response.json();
     } catch (error) {
         console.error('API Error:', error);
         return { error: true, message: error.message };
@@ -94,54 +61,109 @@ const fetchData = async (endpoint, options = {}) => {
 
 // --- Renderers ---
 
-const renderReservationsView = async () => {
+// REZERVASYON GÖRÜNÜMÜ (SEKMELİ YAPI)
+window.renderReservationsView = async (filter = 'pending') => {
     showLoading();
-    const data = await fetchData('reservations');
-    
-    // Show the interface even if there's an API error, embed the error message inside.
-    const reservations = (data && !data.error) ? (data.reservations || []) : [];
-    
-   // If there's an error and the list is empty, we can show an empty list instead of a general error and notify the user. 
-   //  Or we can fill the entire screen with showError. I'm showing the list because you want to access the interface.
+    const data = await fetchData('reservations/by-restaurant');
+    let reservations = (data && !data.error) ? (data.reservations || []) : [];
+
+    // ŞİMDİKİ ZAMANI AL (Completed kontrolü için)
+    const now = new Date();
+
+    // FİLTRELEME MANTIĞI
+    if (filter === 'pending') {
+        reservations = reservations.filter(r => r.status === 'Pending');
+    } else if (filter === 'confirmed') {
+        // Sadece saati henüz gelmemiş veya geçmemiş olan onaylılar
+        reservations = reservations.filter(r => r.status === 'Confirmed' && new Date(r.date) >= now);
+    } else if (filter === 'declined') {
+        reservations = reservations.filter(r => r.status === 'Declined');
+    } else if (filter === 'completed') {
+        // Saati geçmiş ve onaylanmış olanlar
+        reservations = reservations.filter(r => r.status === 'Confirmed' && new Date(r.date) < now);
+    }
 
     DOM.mainContent.innerHTML = `
-        <h2 class="text-3xl font-bold mb-6 text-gray-800"> Reservations</h2>
+        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4">
+            <h2 class="text-3xl font-bold text-gray-800">Reservations</h2>
+            
+            <div class="flex bg-gray-100 p-1 rounded-xl border border-gray-200 w-full xl:w-auto overflow-x-auto">
+                <button onclick="renderReservationsView('pending')" 
+                    class="flex-1 px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition whitespace-nowrap ${filter === 'pending' ? 'bg-white text-yellow-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">
+                    Pending
+                </button>
+                <button onclick="renderReservationsView('confirmed')" 
+                    class="flex-1 px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition whitespace-nowrap ${filter === 'confirmed' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">
+                    Confirmed
+                </button>
+                <button onclick="renderReservationsView('completed')" 
+                    class="flex-1 px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition whitespace-nowrap ${filter === 'completed' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">
+                    Completed
+                </button>
+                <button onclick="renderReservationsView('declined')" 
+                    class="flex-1 px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition whitespace-nowrap ${filter === 'declined' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">
+                    Declined
+                </button>
+                <button onclick="renderReservationsView('all')" 
+                    class="flex-1 px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition whitespace-nowrap ${filter === 'all' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">
+                    All History
+                </button>
+            </div>
+        </div>
         
-        ${data && data.error ? `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert"><strong class="font-bold">Error!</strong> <span class="block sm:inline">${data.message}</span></div>` : ''}
-
         <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
             <ul class="space-y-4">
-                ${reservations.length === 0 ? '<p class="text-gray-500 text-center py-8">No Any Reservation.</p>' : reservations.map(r => `
+                ${reservations.length === 0 ? `<p class="text-gray-500 text-center py-8">No ${filter} reservations found.</p>` : reservations.map(r => {
+                    const customerName = r.userName || r.UserName || (r.user && r.user.name) || 'Guest';
+                    const peopleCount = r.peopleCount || r.people || 0;
+                    const resDate = new Date(r.date);
+                    const timeString = r.time || resDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    
+                    // DURUMU BELİRLE (Frontend tarafında geçici statü güncelleme)
+                    let displayStatus = r.status;
+                    if (r.status === 'Confirmed' && resDate < now) {
+                        displayStatus = 'Completed';
+                    }
+
+                    const statusStyles = {
+                        'Confirmed': 'bg-green-100 text-green-800 border-green-200',
+                        'Declined': 'bg-red-100 text-red-800 border-red-200',
+                        'Pending': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                        'Completed': 'bg-blue-100 text-blue-800 border-blue-200'
+                    };
+
+                    return `
                     <li class="p-4 border rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center transition hover:shadow-sm">
                         <div>
-                            <p class="font-bold text-lg text-gray-800">${escapeHtml(r.user?.name || 'Guest')}</p>
-                            <p class="text-gray-600 text-sm flex items-center mt-1">
-                                <span class="mr-3">👥 ${r.people} Person</span>
-                                <span>📅 ${new Date(r.date).toLocaleDateString()} 🕒 ${r.time}</span>
+                            <p class="font-bold text-lg text-gray-800">${escapeHtml(customerName)}</p>
+                            <p class="text-gray-600 text-sm mt-1">
+                                <span class="mr-3">👥 ${peopleCount} Person</span>
+                                <span>📅 ${resDate.toLocaleDateString()} 🕒 ${timeString}</span>
                             </p>
                         </div>
                         <div class="flex items-center space-x-2 mt-3 sm:mt-0">
-                            <span class="px-3 py-1 text-xs font-bold uppercase rounded-full bg-gray-100 text-gray-800">${r.status}</span>
-                            ${r.status === 'Pending' ? `
+                            <span class="px-3 py-1 text-xs font-bold uppercase rounded-full border ${statusStyles[displayStatus] || 'bg-gray-100'}">
+                                ${displayStatus}
+                            </span>
+                            ${displayStatus === 'Pending' ? `
                             <div class="flex space-x-1 ml-2">
-                                <button onclick="updateReservation('${r.id}', 'Confirmed')" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded transition">Accept</button>
-                                <button onclick="updateReservation('${r.id}', 'Declined')" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded transition">Decline</button>
+                                <button onclick="updateReservation('${r.id}', 'Confirmed')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition text-sm">Accept</button>
+                                <button onclick="updateReservation('${r.id}', 'Declined')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition text-sm">Decline</button>
                             </div>
                             ` : ''}
                         </div>
                     </li>
-                `).join('')}
+                `}).join('')}
             </ul>
         </div>
     `;
 };
 
+// MENÜ GÖRÜNÜMÜ
 const renderMenuView = async () => {
     showLoading();
     const data = await fetchData(API_CONFIG.ENDPOINTS.MENU);
     const menuItems = (data && !data.error) ? (data.menu || []) : [];
-
-    // Veriyi kategorilere göre gruplayalım
     const groupedMenu = menuItems.reduce((acc, item) => {
         const cat = item.category || 'Other';
         if (!acc[cat]) acc[cat] = [];
@@ -151,7 +173,6 @@ const renderMenuView = async () => {
 
     DOM.mainContent.innerHTML = `
         <h2 class="text-3xl font-bold mb-6 text-gray-800">Menu Manager</h2>
-        
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 space-y-8">
                 ${Object.keys(groupedMenu).length === 0 ? '<p class="text-gray-500 italic">Menu is empty.</p>' : 
@@ -175,49 +196,32 @@ const renderMenuView = async () => {
                     </div>
                 `).join('')}
             </div>
-            
             <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 h-fit sticky top-6">
                 <h3 class="text-xl font-semibold mb-4 text-indigo-600">Add New Item</h3>
                 <form id="add-menu-item-form" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Name</label>
-                        <input name="name" type="text" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Category</label>
-                        <select name="category" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5" required>
-                            <option value="">Select Category</option>
-                            ${API_CONFIG.CATEGORIES.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Price (PLN)</label>
-                        <input name="price" type="number" step="0.5" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Description</label>
-                        <textarea name="description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5" required></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-lg transition shadow-md">Add to Menu</button>
+                    <div><label class="block text-sm font-medium">Name</label><input name="name" type="text" class="mt-1 block w-full border rounded-lg p-2.5" required></div>
+                    <div><label class="block text-sm font-medium">Category</label><select name="category" class="mt-1 block w-full border rounded-lg p-2.5" required>
+                        <option value="">Select Category</option>
+                        ${API_CONFIG.CATEGORIES.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                    </select></div>
+                    <div><label class="block text-sm font-medium">Price (PLN)</label><input name="price" type="number" step="0.5" class="mt-1 block w-full border rounded-lg p-2.5" required></div>
+                    <div><label class="block text-sm font-medium">Description</label><textarea name="description" rows="3" class="mt-1 block w-full border rounded-lg p-2.5" required></textarea></div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-lg shadow-md hover:bg-indigo-700 transition">Add to Menu</button>
                 </form>
             </div>
         </div>
     `;
-    
     const form = document.getElementById('add-menu-item-form');
     if(form) form.addEventListener('submit', handleAddMenuSubmit);
 };
 
+// YORUMLAR GÖRÜNÜMÜ
 const renderReviewsView = async () => {
     showLoading();
     const data = await fetchData('reviews');
     const reviews = (data && !data.error) ? (data.reviews || []) : [];
-    
     DOM.mainContent.innerHTML = `
         <h2 class="text-3xl font-bold mb-6 text-gray-800">Customer Comments</h2>
-        
-        ${data && data.error ? `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">${data.message}</div>` : ''}
-
         <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
             <div class="space-y-6">
                 ${reviews.length === 0 ? '<p class="text-gray-500 text-center py-4">No Comments Yet.</p>' : reviews.map(r => `
@@ -234,110 +238,49 @@ const renderReviewsView = async () => {
     `;
 };
 
-const renderTicketsView = async () => {
-    showLoading();
-    const data = await fetchData('tickets');
-    const tickets = (data && !data.error) ? (data.tickets || []) : [];
-
-    DOM.mainContent.innerHTML = `
-        <h2 class="text-3xl font-bold mb-6 text-gray-800">Support Tickets</h2>
-        
-        ${data && data.error ? `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">${data.message}</div>` : ''}
-
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-            <table class="w-full text-left">
-                 <thead>
-                    <tr class="border-b border-gray-700">
-                        <th class="p-3">ID</th>
-                        <th class="p-3">Subject</th>
-                        <th class="p-3">Status</th>
-                        <th class="p-3">Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tickets.length === 0 ? '<tr><td colspan="4" class="p-3 text-center text-gray-500">Couldnt Find.</td></tr>' : tickets.map(t => `
-                        <tr class="border-b border-gray-200 hover:bg-gray-50">
-                            <td class="p-3 font-mono text-xs text-gray-600">${t.id}</td>
-                            <td class="p-3 font-medium">${escapeHtml(t.subject)}</td>
-                            <td class="p-3">${t.status}</td>
-                            <td class="p-3">${new Date(t.createdAt).toLocaleDateString()}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </div>
-    `;
-};
-
+// AYARLAR GÖRÜNÜMÜ
 const renderSettingsView = async () => {
     showLoading();
     const data = await fetchData(API_CONFIG.ENDPOINTS.ME);
     const settings = (data && !data.error) ? (data.restaurant || data) : {};
-
     DOM.mainContent.innerHTML = `
         <h2 class="text-3xl font-bold mb-6 text-gray-800">Restoran Settings</h2>
-        
-        ${data && data.error ? `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">${data.message}</div>` : ''}
-
         <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200 max-w-2xl mx-auto">
             <form id="settings-form" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Restoran Name</label>
-                        <input name="name" type="text" value="${escapeHtml(settings.name || '')}" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Telefon</label>
-                        <input name="phone" type="text" value="${escapeHtml(settings.phone || '')}" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5">
-                    </div>
+                    <div><label class="block text-sm font-medium">Name</label><input name="name" type="text" value="${escapeHtml(settings.name || '')}" class="mt-1 block w-full border rounded-lg p-2.5"></div>
+                    <div><label class="block text-sm font-medium">Phone</label><input name="phone" type="text" value="${escapeHtml(settings.phone || '')}" class="mt-1 block w-full border rounded-lg p-2.5"></div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Adress</label>
-                    <input name="address" type="text" value="${escapeHtml(settings.address || '')}" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Type</label>
-                    <input name="cuisine" type="text" value="${escapeHtml(settings.cuisine || '')}" class="mt-1 block w-full border border-gray-300 rounded-lg p-2.5">
-                </div>
-                <div class="pt-4">
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md">Save</button>
-                </div>
+                <div><label class="block text-sm font-medium">Address</label><input name="address" type="text" value="${escapeHtml(settings.address || '')}" class="mt-1 block w-full border rounded-lg p-2.5"></div>
+                <div><label class="block text-sm font-medium">Cuisine</label><input name="cuisine" type="text" value="${escapeHtml(settings.cuisine || '')}" class="mt-1 block w-full border rounded-lg p-2.5"></div>
+                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition">Save Changes</button>
             </form>
         </div>
     `;
-    
     const form = document.getElementById('settings-form');
     if(form) form.addEventListener('submit', handleSettingsSubmit);
 };
 
 // --- ACTION HANDLERS ---
-
 window.updateReservation = async (id, status) => {
-    if(!confirm(`Are you sure to do (${status}) that?`)) return;
-    
-    const result = await fetchData(`${API_CONFIG.ENDPOINTS.RESERVATIONS}/${id}`, {
+    if(!confirm(`Are you sure you want to ${status.toUpperCase()} this reservation?`)) return;
+    const result = await fetchData(`reservations/${id}`, {
         method: 'PUT',
         body: JSON.stringify({ status: status })
     });
-    
     if (result && !result.error) {
-        alert('Completed!');
-        renderReservationsView();
+        alert('Status Updated!');
+        renderReservationsView(); 
     } else {
-        alert('Unsuccessful: ' + (result?.message || 'error'));
+        alert('Failed: ' + (result?.message || 'error'));
     }
 };
 
 window.deleteMenuItem = async (id) => {
-    if(confirm('Bu yemeği silmek istediğinize emin misiniz?')) {
-        // Endpoint'i dinamik yaptık
-        const result = await fetchData(`${API_CONFIG.ENDPOINTS.MENU}/${id}`, { method: 'DELETE' });
-        if (result && !result.error) {
-            alert('Başarıyla silindi!');
-            renderMenuView();
-        } else {
-             alert('Hata: ' + (result?.message || 'Silinemedi'));
-        }
+    if(!confirm('Delete this item?')) return;
+    const result = await fetchData(`${API_CONFIG.ENDPOINTS.MENU}/${id}`, { method: 'DELETE' });
+    if (result && !result.error) {
+        renderMenuView();
     }
 };
 
@@ -345,41 +288,26 @@ const handleAddMenuSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const newItem = Object.fromEntries(formData.entries());
-    
-    // Backend decimal beklediği için fiyatı sayıya çevirelim
     newItem.price = parseFloat(newItem.price);
-    console.log('Adding Menu Item:', newItem);
-
     const result = await fetchData(API_CONFIG.ENDPOINTS.MENU, {
         method: 'POST',
         body: JSON.stringify(newItem)
     });
-    
     if (result && !result.error) {
-        alert('Yemek başarıyla eklendi!');
-        e.target.reset(); // Formu temizle
+        e.target.reset();
         renderMenuView();
-    } else {
-        alert('Ekleme başarısız: ' + (result?.message || 'Hata oluştu'));
     }
 };
 
 const handleSettingsSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const updatedSettings = Object.fromEntries(formData.entries());
-    
+    const updated = Object.fromEntries(formData.entries());
     const result = await fetchData(API_CONFIG.ENDPOINTS.ME, {
         method: 'PUT',
-        body: JSON.stringify(updatedSettings)
+        body: JSON.stringify(updated)
     });
-    
-    if (result && !result.error) {
-        alert('Updatd!');
-        renderSettingsView(); 
-    } else {
-        alert('Update Unsuccesfull: ' + (result?.message || 'Error'));
-    }
+    if (result && !result.error) alert('Settings Saved!');
 };
 
 // --- ROUTER ---
@@ -387,9 +315,7 @@ const handleNavigation = (e) => {
     const link = e.target.closest('.sidebar-link');
     if (!link) return;
     e.preventDefault();
-
     const targetId = link.getAttribute('href').substring(1);
-
     document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active', 'bg-indigo-50', 'text-indigo-600'));
     link.classList.add('active', 'bg-indigo-50', 'text-indigo-600');
     
@@ -397,7 +323,6 @@ const handleNavigation = (e) => {
         case 'reservations': renderReservationsView(); break;
         case 'menu': renderMenuView(); break;
         case 'reviews': renderReviewsView(); break;
-        case 'tickets': renderTicketsView(); break;
         case 'settings': renderSettingsView(); break;
         default: renderReservationsView();
     }
@@ -405,7 +330,7 @@ const handleNavigation = (e) => {
 
 const handleLogout = (e) => {
     e.preventDefault();
-    if(confirm('Are you sure to exit?')) {
+    if(confirm('Logout?')) {
         localStorage.clear();
         window.location.href = '../commonfiles/main-page.html';
     }
@@ -414,11 +339,6 @@ const handleLogout = (e) => {
 // --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
     if(DOM.sidebarNav) DOM.sidebarNav.addEventListener('click', handleNavigation);
-    
-    if(DOM.logoutButton) {
-        DOM.logoutButton.addEventListener('click', handleLogout);
-    }
-    
-    //Load reservations by default.
-    renderReservationsView();
+    if(DOM.logoutButton) DOM.logoutButton.addEventListener('click', handleLogout);
+    renderReservationsView('pending'); // Varsayılan olarak bekleyenleri getir
 });
