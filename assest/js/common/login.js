@@ -1,5 +1,5 @@
 // --- API CONFIGURATION ---
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:5500';
 
 // --- DOM Elements ---
 const loginForm = document.getElementById('login-form');
@@ -118,3 +118,74 @@ displayMessage('Login successful! Redirecting...', 'success');
 
 // --- Event Listener ---
 loginForm.addEventListener('submit', handleLogin);
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const helpLink = document.getElementById("help-link");
+      const helpModal = document.getElementById("help-modal");
+      const closeHelp = document.getElementById("close-help");
+
+      helpLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        helpModal.classList.remove("hidden");
+      });
+
+      closeHelp.addEventListener("click", () => {
+        helpModal.classList.add("hidden");
+      });
+
+      helpModal.addEventListener("click", (e) => {
+        if (e.target === helpModal) {
+          helpModal.classList.add("hidden");
+        }
+      });
+    });
+  //CHATBOT SCRIPTS
+const chatIcon = document.getElementById('chat-icon');
+    
+    if (chatIcon) {
+        // Create Ballon To Ask Do you have a question
+        const bubble = document.createElement('div');
+        // Tailwind Classes
+        bubble.className = "fixed bottom-24 right-20 bg-white text-gray-800 px-4 py-2 rounded-xl shadow-2xl border border-gray-200 text-sm font-bold z-50 transform scale-0 origin-bottom-right transition-transform duration-500 ease-out";
+        bubble.innerHTML = "Do you need help? 👋"; 
+        
+       
+        const arrow = document.createElement('div');
+        arrow.className = "absolute -bottom-1 right-4 w-3 h-3 bg-white border-b border-r border-gray-200 transform rotate-45";
+        bubble.appendChild(arrow);
+        
+        document.body.appendChild(bubble);
+
+        // Shaking Animation
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes shake-hard {
+                0% { transform: rotate(0deg); }
+                25% { transform: rotate(15deg); }
+                50% { transform: rotate(0deg); }
+                75% { transform: rotate(-15deg); }
+                100% { transform: rotate(0deg); }
+            }
+            .animate-shake-hard {
+                animation: shake-hard 0.4s ease-in-out infinite;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // It will work after 3 Seconds
+        setTimeout(() => {
+            // show ballon
+            bubble.classList.remove('scale-0');
+            
+            // shake
+            chatIcon.classList.remove('animate-bounce'); 
+            chatIcon.classList.add('animate-shake-hard');
+            
+            // It will stop to shake after 2 seconds
+            setTimeout(() => {
+                chatIcon.classList.remove('animate-shake-hard');
+            }, 2000);
+
+        }, 3000);
+    }

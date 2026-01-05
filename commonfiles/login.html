@@ -8,6 +8,29 @@
     <link rel="icon" type="image/x-icon" href="../assest/logo/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assest/css/user/login.css">
+    <link rel="stylesheet" href="../assest/css/common/chatbot.css">
+ <style>
+        /* Chatbot Logo */
+        .chat-icon {
+            background-color: #f97316 !important; /* Tailwind orange-500 equivalent */
+        }
+        .chat-icon:hover {
+            background-color: #ea580c !important; /* Tailwind orange-600 equivalent */
+        }
+        /* Chatbot Logo */
+        .chat-header {
+            background-color: #f97316 !important; /* Tailwind orange-500 equivalent */
+            color: white !important;
+        }
+        /* Send Button */
+        #send-btn {
+            background-color: #f97316 !important;
+        }
+        #send-btn:hover {
+            background-color: #ea580c !important;
+        }
+    </style>
+
     <style>
         /* Fade In Animation for the Card */
         .fade-in-card {
@@ -48,7 +71,7 @@
                 <div>
                     <label for="email" class="text-sm font-medium text-gray-300">Email</label>
                     <input id="email" name="usernameOrEmail" type="text" autocomplete="email" required
-                           class="mt-2 w-full p-3 text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+                           class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
                            placeholder="you@example.com">
                 </div>
                 <div>
@@ -112,9 +135,28 @@
             </a>
         </div>
 
+         <div class="chat-icon shadow-lg hover:shadow-xl transition-all duration-300 z-50" id="chat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.839 8.839 0 01-4.083-.982A.978.978 0 004 16.307V17a1 1 0 01-1-1v-2.143a1 1 0 00-.617-.928A9.01 9.01 0 012 10c0-4.97 4.477-9 10-9s10 4.03 10 9z" clip-rule="evenodd" />
+        </svg>
+    </div>
+
+    <div class="chat-window z-50 shadow-2xl border border-orange-200 rounded-2xl overflow-hidden" id="chat-window">
+        <div class="chat-header">
+            <h3>MenuMaster Bot</h3>
+            <button id="close-chat" class="close-chat-btn hover:text-orange-200 transition-colors">&times;</button>
+        </div>
+        <div class="chat-body bg-orange-50" id="chat-body"></div>
+        <div class="chat-footer bg-white border-t border-orange-100">
+            <input type="text" id="chat-input" placeholder="Write A Message....." class="focus:ring-orange-500 focus:border-orange-500">
+            <button id="send-btn" class="transition-colors">Send</button>
+        </div>
+    </div>
+
         <p class="text-gray-500 text-sm">&copy; 2026 MenuMaster - All rights reserved.</p>
     </footer>
 
     <script src="../assest/js/common/login.js"></script>
+    <script src="../assest/js/common/chatbot.js" defer></script>
 </body>
 </html>
