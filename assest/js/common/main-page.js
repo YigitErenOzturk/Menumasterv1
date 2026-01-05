@@ -213,3 +213,71 @@ window.addEventListener('scroll', checkScroll);
 // Start fetching data when the page loads
 initAndLoadData();
 
+const createRestaurantCards = (restaurants) => {
+  if (!Array.isArray(restaurants) || restaurants.length === 0) {
+    return '<p class="col-span-4 text-center text-gray-400">No restaurants found.</p>';
+  }
+
+  return restaurants.map(r => {
+    const badgeText = r.rating ? `⭐ ${r.rating}` : 'New';
+    return `
+      <a href="../restaurantfiles/restaurant-details.html?id=${r.id}&name=${encodeURIComponent(r.name)}" class="block bg-gray-800 rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300 group">
+        <div class="relative h-48 overflow-hidden">
+          <img src="${r.imageUrl || 'https://placehold.co/400x200?text=Restaurant'}" alt="${escapeHtml(r.name)}" class="w-full h-full object-cover group-hover:opacity-75 transition-opacity">
+          <div class="absolute top-2 right-2 bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md">${badgeText}</div>
+        </div>
+        <div class="p-4">
+          <h3 class="text-lg font-semibold text-indigo-400 truncate">${escapeHtml(r.name)}</h3>
+          <p class="text-gray-400 text-sm mt-1 uppercase tracking-wider text-xs">${escapeHtml(r.cuisine || 'Global')}</p>
+        </div>
+      </a>
+    `;
+  }).join('');
+};
+
+const renderDashboardView = async () => {
+  // grid
+  DOM.mainContent.innerHTML = `
+    <div class="animate-fade-in">
+      <h1 class="text-3xl font-bold text-white mb-6">Discover Restaurants</h1>
+      <div class="mb-8">
+        <label for="city-select" class="text-sm font-medium text-gray-300">Filter by City:</label>
+        <select id="city-select" class="mt-2 w-full max-w-sm p-3 text-gray-100 bg-gray-800 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition-colors outline-none">
+          <option value="">All Cities (Popular)</option>
+        </select>
+      </div>
+      <div id="restaurant-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="col-span-4 flex justify-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div></div>
+      </div>
+    </div>`;
+
+  // for filter 
+  const citySelect = document.getElementById('city-select');
+  const cities = await fetchData('cities');
+  if (!cities.error && Array.isArray(cities)) {
+    citySelect.innerHTML += cities.map(city => `<option value="${escapeHtml(city.name)}">${escapeHtml(city.name)}</option>`).join('');
+  }
+
+  // --- Restaurants ---
+  const loadRestaurants = async (filter = '') => {
+    const grid = document.getElementById('restaurant-grid');
+    // Downloading animation
+    grid.innerHTML = '<div class="col-span-4 flex justify-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div></div>';
+
+    // If filtered it will show only selected city otherway all
+    const endpointPath = filter ? `restaurants?city=${encodeURIComponent(filter)}` : 'restaurants/all';
+    
+    // API
+    let restaurants = await fetchData(endpointPath);
+    if (restaurants.error || !Array.isArray(restaurants)) restaurants = [];
+    
+    // Turns to html and show to screen
+    grid.innerHTML = createRestaurantCards(restaurants);
+  };
+
+  // when city seelcted it will reniew again the screen
+  citySelect.addEventListener('change', (e) => loadRestaurants(e.target.value));
+  
+  // it will download page when open screen
+  loadRestaurants();
+};

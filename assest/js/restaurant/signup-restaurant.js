@@ -44,7 +44,7 @@ const handleRestaurantSignup = async (event) => {
 
         if (!response.ok) {
             // Backend'den gelen hata detaylarını konsola bas (Neden 400 aldığını buradan göreceğiz)
-            console.error("Backend Hata Detayı:", result);
+            console.error("Backend Error:", result);
             
             // Eğer backend validation errors dönüyorsa onları yakala
             const errorMessage = result.errors ? JSON.stringify(result.errors) : (result.message || `Error ${response.status}`);
@@ -57,8 +57,60 @@ const handleRestaurantSignup = async (event) => {
 
     } catch (error) {
         console.error("Signup Error:", error);
-        msg.textContent = "Hata: Bilgileri kontrol edip tekrar deneyin.";
+        msg.textContent = "Error, Check informations one more time.";
         msg.className = 'text-center text-red-400';
     }
 };
 signupForm.addEventListener('submit', handleRestaurantSignup);
+
+
+  const dropArea = document.getElementById('drop-area');
+  const fileInput = document.getElementById('file-input');
+  const imgPreview = document.getElementById('img-preview');
+
+  // upload
+  fileInput.addEventListener('change', function() {
+    const file = this.files[0];
+    showPreview(file);
+  });
+
+  // Drag & Drop 
+  
+  // When you hover over the file
+  dropArea.addEventListener('dragover', (event) => {
+    event.preventDefault(); // Block default behavior
+    dropArea.classList.add('drag-active');
+  });
+
+  // on file
+  dropArea.addEventListener('dragleave', () => {
+    dropArea.classList.remove('drag-active');
+  });
+
+  // drop file
+  dropArea.addEventListener('drop', (event) => {
+    event.preventDefault();
+    dropArea.classList.remove('drag-active');
+    
+    const file = event.dataTransfer.files[0];
+    //  assign the file to the input field so it's sent when the form is submitted.
+    fileInput.files = event.dataTransfer.files; 
+    
+    showPreview(file);
+  });
+
+  // 3. review
+  function showPreview(file) {
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        imgPreview.src = e.target.result;
+        dropArea.classList.add('has-image'); // hide icon with css
+      }
+      
+      reader.readAsDataURL(file);
+    } else {
+      alert("Choose a picture!");
+    }
+  }

@@ -7,7 +7,7 @@ const API_CONFIG = {
         RESERVATIONS: 'restaurants/reservations',
         REVIEWS: 'restaurants/reviews',
         TICKETS: 'restaurants/tickets',
-        ME: 'restaurants/me'
+        ME: 'restaurants/me' // Restoran Settings
     }
 };
 

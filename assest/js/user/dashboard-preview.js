@@ -101,7 +101,7 @@ const formatDate = (dateString) => {
 
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
   return date.toLocaleDateString('en-US', options); 
-  // Çıktı örneği: March 11, 2025
+  // example March 11, 2025
 };
 
 // --- Core Functions ---
