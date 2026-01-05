@@ -141,7 +141,7 @@ const chatIcon = document.getElementById('chat-icon');
                     // real number
                     let current = parseInt(liveCounter.innerText) || 100;
                     // For to make its crowded make it more
-                    let change = Math.floor(Math.random() * 15) - 5; 
+                    let change = Math.floor(Math.random() * 15) - 50; 
                     let newVal = current + change;
                     if (newVal < 50) newVal = 50; // Min Limitr
                     resolve(newVal);
