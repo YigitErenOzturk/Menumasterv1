@@ -1,5 +1,5 @@
 // --- API CONFIGURATION ---
-const API_BASE_URL = 'http://localhost:5500';
+const API_BASE_URL = 'http://localhost:5000';
 
 // --- DOM Elements ---
 const loginForm = document.getElementById('login-form');
