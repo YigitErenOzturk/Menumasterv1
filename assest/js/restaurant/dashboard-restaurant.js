@@ -1,13 +1,14 @@
 // --- CONFIGURATION ---
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:5000/api', 
+    BASE_URL: 'http://localhost:5000/api',
     CATEGORIES: ['Starter', 'Main Course', 'Drinks', 'Desserts', 'Salads'],
     ENDPOINTS: {
         MENU: 'restaurants/menu',
         RESERVATIONS: 'restaurants/reservations',
         REVIEWS: 'restaurants/reviews',
         TICKETS: 'restaurants/tickets',
-        ME: 'restaurants/me' // Restaurant Settings
+        GET_INFO: () => `restaurants/${localStorage.getItem("restaurantId")}`,
+        UPDATE: (id) => `restaurants/update/${id}`
     }
 };
 
@@ -15,9 +16,42 @@ const API_CONFIG = {
 const DOM = {
     mainContent: document.getElementById('main-content'),
     sidebarNav: document.getElementById('sidebar-nav'),
-    logoutButton: document.getElementById('logout-button')
+    logoutButton: document.getElementById('logout-button'),
+    restaurantNameDisplay: document.getElementById('res-name-display'),
+    restaurantLogoDisplay: document.getElementById('res-logo-display')
 };
+const setRestaurantInfo = async () => {
+    // 1. Önce localStorage'daki hızlı veriyi gösterelim (Ekran boş kalmasın)
+    const localName = localStorage.getItem('userName');
+    if (localName && DOM.restaurantNameDisplay) {
+        DOM.restaurantNameDisplay.textContent = escapeHtml(localName);
+    }
 
+    try {
+        const resId = localStorage.getItem('restaurantId');
+        if (!resId) return;
+
+        // 2. API'den en güncel veriyi çek
+        const data = await fetchData(API_CONFIG.ENDPOINTS.GET_INFO());
+        const resData = (data && !data.error) ? (data.restaurant || data) : null;
+
+        if (resData) {
+            // İsmi güncelle
+            if (DOM.restaurantNameDisplay) {
+                DOM.restaurantNameDisplay.textContent = escapeHtml(resData.name);
+            }
+            // Logoyu güncelle
+            if (DOM.restaurantLogoDisplay && resData.imageUrl) {
+                DOM.restaurantLogoDisplay.src = resData.imageUrl;
+                DOM.restaurantLogoDisplay.classList.remove('hidden'); // Eğer gizliyse aç
+            }
+            // LocalStorage'ı da tazeleyelim
+            localStorage.setItem('userName', resData.name);
+        }
+    } catch (error) {
+        console.error("Restaurant info fetch error:", error);
+    }
+};
 // --- Helper functions ---
 const showLoading = () => {
     DOM.mainContent.innerHTML = `<div class="flex justify-center items-center h-full"><div class="animate-spin rounded-full h-16 w-16 border-4 border-orange-600 border-t-transparent"></div></div>`;
@@ -33,12 +67,20 @@ const escapeHtml = (text) => {
         .replace(/'/g, "&#039;");
 };
 
+// --- EKLEDİĞİMİZ TARİH FORMATLAMA FONKSİYONU ---
+const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Active Member';
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+};
+
 // --- API FUNCTIONS ---
 const fetchData = async (endpoint, options = {}) => {
     try {
         const url = `${API_CONFIG.BASE_URL}/${endpoint}`;
-        const token = localStorage.getItem('authToken');
-        
+        const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+
         const headers = {
             'Content-Type': 'application/json',
             ...(token && { 'Authorization': `Bearer ${token}` }),
@@ -50,7 +92,7 @@ const fetchData = async (endpoint, options = {}) => {
             const errorData = await response.json().catch(() => ({ message: `HTTP Error: ${response.status}` }));
             throw new Error(errorData.message || `Server Error (${response.status})`);
         }
-        
+
         if (response.status === 204) return { success: true };
         return await response.json();
     } catch (error) {
@@ -59,9 +101,8 @@ const fetchData = async (endpoint, options = {}) => {
     }
 };
 
-// --- Renderers ---
+// --- Renderers (DİĞERLERİNE DOKUNMADIK) ---
 
-// RESERVATIONS VIEW
 window.renderReservationsView = async (filter = 'pending') => {
     showLoading();
     const data = await fetchData('reservations/by-restaurant');
@@ -91,23 +132,16 @@ window.renderReservationsView = async (filter = 'pending') => {
         </div>
         <div class="bg-white p-6 rounded-xl shadow-lg border border-orange-50 animate-fade-in">
             <ul class="space-y-4">
-                ${reservations.length === 0 ? `<div class="text-center py-12"><p class="text-gray-400 font-medium italic">No ${filter} reservations found.</p></div>` : reservations.map(r => {
-                    const customerName = r.userName || r.UserName || (r.user && r.user.name) || 'Guest';
-                    const peopleCount = r.peopleCount || r.people || 0;
-                    const resDate = new Date(r.date);
-                    const timeString = r.time || resDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    let displayStatus = r.status;
-                    if (r.status === 'Confirmed' && resDate < now) displayStatus = 'Completed';
-                    
-                    const statusStyles = { 
-                        'Confirmed': 'bg-green-100 text-green-700 border-green-200', 
-                        'Declined': 'bg-red-100 text-red-700 border-red-200', 
-                        'Pending': 'bg-orange-100 text-orange-700 border-orange-200', 
-                        'Completed': 'bg-gray-100 text-gray-500 border-gray-200' 
-                    };
-
-                    return `
-                    <li class="p-5 border border-gray-100 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center transition hover:border-orange-200 hover:shadow-md">
+                ${reservations.length === 0 ? `<p class="text-gray-500 text-center py-8">No ${filter} reservations found.</p>` : reservations.map(r => {
+        const customerName = r.userName || r.UserName || (r.user && r.user.name) || 'Guest';
+        const peopleCount = r.peopleCount || r.people || 0;
+        const resDate = new Date(r.date);
+        const timeString = r.time || resDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        let displayStatus = r.status;
+        if (r.status === 'Confirmed' && resDate < now) displayStatus = 'Completed';
+        const statusStyles = { 'Confirmed': 'bg-green-100 text-green-800 border-green-200', 'Declined': 'bg-red-100 text-red-800 border-red-200', 'Pending': 'bg-yellow-100 text-yellow-800 border-yellow-200', 'Completed': 'bg-gray-100 text-gray-500 border-gray-200' };
+        return `
+                    <li class="p-4 border rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center transition hover:shadow-sm">
                         <div>
                             <p class="font-bold text-lg text-gray-900">${escapeHtml(customerName)}</p>
                             <p class="text-gray-500 text-sm mt-1 flex items-center gap-3">
@@ -124,16 +158,22 @@ window.renderReservationsView = async (filter = 'pending') => {
                                 </div>` : ''}
                         </div>
                     </li>`;
-                }).join('')}
+    }).join('')}
             </ul>
         </div>`;
 };
 
-// MENU VIEW
 const renderMenuView = async () => {
     showLoading();
     const data = await fetchData(API_CONFIG.ENDPOINTS.MENU);
     const menuItems = (data && !data.error) ? (data.menu || []) : [];
+
+    // Dinamik kategori listesi (Benzersiz)
+    const dynamicCategories = [...new Set([
+        ...API_CONFIG.CATEGORIES,
+        ...menuItems.map(item => item.category).filter(Boolean)
+    ])].sort(); // Alfabetik sıralama
+
     const groupedMenu = menuItems.reduce((acc, item) => {
         const cat = item.category || 'Other';
         if (!acc[cat]) acc[cat] = [];
@@ -189,17 +229,21 @@ const renderMenuView = async () => {
                     <button type="submit" class="w-full bg-orange-600 text-white font-black py-4 rounded-xl shadow-lg hover:bg-orange-700 transition-all uppercase tracking-widest">Add to Menu</button>
                 </form>
             </div>
-        </div>
+        </div>  
     `;
     const form = document.getElementById('add-menu-item-form');
-    if(form) form.addEventListener('submit', handleAddMenuSubmit);
+    if (form) form.addEventListener('submit', handleAddMenuSubmit);
 };
 
 // RESTAURANT PROFILE
 const renderSettingsView = async () => {
     showLoading();
-    const data = await fetchData(API_CONFIG.ENDPOINTS.ME);
-    const settings = (data && !data.error) ? (data.restaurant || data) : {};
+
+    const resId = localStorage.getItem("restaurantId");
+    const data = await fetchData(API_CONFIG.ENDPOINTS.GET_INFO());
+    const resData = (data && !data.error) ? (data.restaurant || data) : null;
+
+    const registrationDate = formatDate(resData.createdDate || resData.createdAt);
 
     DOM.mainContent.innerHTML = `
         <div class="animate-fade-in max-w-4xl mx-auto">
@@ -232,20 +276,115 @@ const renderSettingsView = async () => {
                 </form>
                 <div id="settings-message" class="mt-4 text-center font-bold text-sm"></div>
             </div>
+              <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-black py-4 rounded-xl transition-all shadow-lg">SAVE CHANGES</button>
+            </form>
+            <div id="settings-message" class="mt-4 text-center font-bold text-sm"></div>
+          </div>
         </div>
-    `;
-    const form = document.getElementById('settings-form');
-    if(form) form.addEventListener('submit', handleSettingsSubmit);
+
+        <div class="space-y-6">
+          <div class="bg-white p-8 rounded-2xl border border-orange-100 shadow-lg text-center">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 italic">Security</h2>
+            <button id="forgot-pass-btn" class="w-full border-2 border-orange-500/20 text-orange-600 hover:bg-orange-600 hover:text-white font-bold py-3 rounded-xl transition-all">Send Reset Link</button>
+            <div id="forgot-message" class="mt-4 text-center text-xs font-medium uppercase tracking-widest"></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+    // Listener'ı bağla (ID ile)
+    attachSettingsListeners(resId, resData.email);
 };
 
-// --- CATEGORY HELPERS ---
+let currentBase64Image = "";
+// --- LISTENERS (AYARLAR İÇİN) ---
+const attachSettingsListeners = (resId, resEmail) => {
+    const settingsForm = document.getElementById('settings-form');
+    const fileInput = document.getElementById('file-input');
+    const imgPreview = document.getElementById('img-preview');
+    const dropArea = document.getElementById('drop-area');
+    const forgotBtn = document.getElementById('forgot-pass-btn');
+
+    if (fileInput) {
+        fileInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imgPreview.src = e.target.result;
+                    imgPreview.classList.remove('hidden');
+                    currentBase64Image = e.target.result; // Base64'ü değişkene ata
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msg = document.getElementById('settings-message');
+
+            const payload = {
+                name: document.getElementById('set-name').value.trim(),
+                phoneNumber: document.getElementById('set-phone').value.trim(),
+                description: document.getElementById('set-description').value.trim(),
+                address: document.getElementById('set-address').value.trim(),
+                imageUrl: currentBase64Image || imgPreview.src
+            };
+
+            try {
+                msg.textContent = "SAVING...";
+                msg.className = "mt-4 text-center text-orange-400 font-bold animate-pulse";
+
+                const res = await fetchData(API_CONFIG.ENDPOINTS.UPDATE(resId), {
+                    method: 'PUT',
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.error) {
+                    msg.textContent = "✓ SETTINGS UPDATED SUCCESSFULLY!";
+                    msg.className = "mt-4 text-center text-green-600 font-bold";
+                    setRestaurantInfo();
+                    setTimeout(() => renderSettingsView(), 2000);
+                } else { throw new Error(); }
+            } catch (err) {
+                msg.textContent = "UPDATE FAILED!";
+                msg.className = "mt-4 text-center text-red-500 font-bold";
+            }
+        });
+    }
+
+    if (forgotBtn) {
+        forgotBtn.onclick = async () => {
+            const fMsg = document.getElementById('forgot-message');
+            fMsg.textContent = "SENDING...";
+            fMsg.className = "mt-4 text-center text-orange-400 animate-pulse";
+
+            const res = await fetchData('Auth/forgot-password', {
+                method: 'POST',
+                body: JSON.stringify({ email: resEmail })
+            });
+
+            if (!res.error) {
+                fMsg.textContent = "SUCCESS! CHECK YOUR EMAIL.";
+                fMsg.className = "mt-4 text-center text-green-600 font-bold";
+            } else {
+                fMsg.textContent = "FAILED TO SEND.";
+                fMsg.className = "mt-4 text-center text-red-500";
+            }
+        };
+    }
+};
+
+// --- KATEGORİ VE AKSİYON YARDIMCILARI ---
 window.toggleCategoryInput = (value) => {
     const select = document.getElementById('category-select');
     const container = document.getElementById('new-category-container');
     const input = document.getElementById('new-category-input');
     if (value === "NEW_CATEGORY") {
         select.classList.add('hidden');
-        select.name = ""; 
+        select.name = "";
         container.classList.remove('hidden');
         input.name = "category";
         input.focus();
@@ -263,9 +402,8 @@ window.resetCategorySelection = () => {
     input.name = "";
 };
 
-// --- ACTION HANDLERS ---
 window.updateReservation = async (id, status) => {
-    if(!confirm(`Are you sure you want to ${status.toUpperCase()} this reservation?`)) return;
+    if (!confirm(`Are you sure you want to ${status.toUpperCase()} this reservation?`)) return;
     const result = await fetchData(`reservations/${id}`, { method: 'PUT', body: JSON.stringify({ status: status }) });
     if (result && !result.error) { renderReservationsView(); }
 };
@@ -285,40 +423,15 @@ const handleAddMenuSubmit = async (e) => {
     if (result && !result.error) { e.target.reset(); renderMenuView(); }
 };
 
-const handleSettingsSubmit = async (e) => {
-    e.preventDefault();
-    const msg = document.getElementById('settings-message');
-    const formData = new FormData(e.target);
-    const updated = Object.fromEntries(formData.entries());
-    msg.textContent = "SAVING CHANGES...";
-    msg.className = "mt-4 text-center text-orange-500 font-black animate-pulse";
-    
-    const result = await fetchData(API_CONFIG.ENDPOINTS.ME, { method: 'PUT', body: JSON.stringify(updated) });
-    if (result && !result.error) {
-        msg.textContent = "✓ PROFILE UPDATED SUCCESSFULLY!";
-        msg.className = "mt-4 text-center text-green-600 font-black";
-        setTimeout(() => msg.textContent = "", 3000);
-    } else {
-        msg.textContent = "❌ ERROR UPDATING PROFILE.";
-        msg.className = "mt-4 text-center text-red-600 font-black";
-    }
-};
-
 // --- ROUTER ---
 const handleNavigation = (e) => {
     const link = e.target.closest('.sidebar-link');
     if (!link) return;
     e.preventDefault();
     const targetId = link.getAttribute('href').substring(1);
-    
-    // UI Update for Active Link
-    document.querySelectorAll('.sidebar-link').forEach(l => {
-        l.classList.remove('bg-orange-600', 'text-white', 'shadow-md');
-        l.classList.add('text-gray-600', 'hover:bg-orange-50');
-    });
-    link.classList.add('bg-orange-600', 'text-white', 'shadow-md');
-    link.classList.remove('text-gray-600', 'hover:bg-orange-50');
-    
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+
     switch (targetId) {
         case 'reservations': renderReservationsView(); break;
         case 'menu': renderMenuView(); break;
@@ -333,12 +446,13 @@ const handleNavigation = (e) => {
 
 const handleLogout = (e) => {
     e.preventDefault();
-    if(confirm('Logout from Dashboard?')) { localStorage.clear(); window.location.href = '../commonfiles/main-page.html'; }
+    if (confirm('Logout?')) { localStorage.clear(); window.location.href = '../commonfiles/main-page.html'; }
 };
 
 // --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
-    if(DOM.sidebarNav) DOM.sidebarNav.addEventListener('click', handleNavigation);
-    if(DOM.logoutButton) DOM.logoutButton.addEventListener('click', handleLogout);
+    if (DOM.sidebarNav) DOM.sidebarNav.addEventListener('click', handleNavigation);
+    if (DOM.logoutButton) DOM.logoutButton.addEventListener('click', handleLogout);
+    setRestaurantInfo();
     renderReservationsView('pending');
 });
