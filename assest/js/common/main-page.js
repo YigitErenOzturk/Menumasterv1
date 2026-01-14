@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error("Error:", error);
             // If there is an error it will be empty or old number
         }
-    });
+    }
 
     // 5. Chat Icon Animasyonu (3 saniye sonra başlar)
     if (chatIcon) {
