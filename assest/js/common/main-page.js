@@ -135,6 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // If there is an error it will be empty or old number
         }
     }
+    });
 
     // 5. Chat Icon Animasyonu (3 saniye sonra başlar)
     if (chatIcon) {
@@ -147,7 +148,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 6. Canlı Sayaç Başlatma
     setInterval(updateLiveCounter, 5000);
     updateLiveCounter();
-});
+    
+
 
 // Arama fonksiyonu (Eğer arama barı HTML'e eklenirse çalışır)
 const handleSearch = async () => {
@@ -155,7 +157,7 @@ const handleSearch = async () => {
     const cuisineInput = document.getElementById('cuisine-input');
     
     if(!locationInput || !cuisineInput) return;
-
+};
     const city = locationInput.value.trim();
     const cuisine = cuisineInput.value.trim();
 
@@ -169,7 +171,8 @@ const handleSearch = async () => {
 
     const url = `${API_BASE_URL}/search?${params.toString()}`;
     fetchData(url);
-};
+
+
 
 // --- Event Listeners and Initial Load ---
 

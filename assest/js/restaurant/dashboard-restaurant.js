@@ -101,7 +101,7 @@ const fetchData = async (endpoint, options = {}) => {
     }
 };
 
-// --- Renderers (DİĞERLERİNE DOKUNMADIK) ---
+// --- Renderers  ---
 
 window.renderReservationsView = async (filter = 'pending') => {
     showLoading();
