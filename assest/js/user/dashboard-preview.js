@@ -4,7 +4,7 @@ const API_CONFIG = {
   ENDPOINTS: {
     USER_BY_ID: (id) => `/users/${id}`,
     UPDATE_USER: (id) => `/users/update/${id}`,
-    FORGOT_PASSWORD: '/users/api/password-reset-request',
+    FORGOT_PASSWORD: '/Auth/forgot-password',
 
     CITIES: '/cities',
     RESTAURANTS_POPULAR: '/restaurants/popular',
@@ -425,7 +425,7 @@ const attachSettingsListeners = (userId, userEmail) => {
         const res = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.FORGOT_PASSWORD}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: userEmail }) 
+          body: JSON.stringify({ email: document.getElementById('set-email').value })
         });
 
         if (res.ok) {

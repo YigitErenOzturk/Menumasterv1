@@ -26,7 +26,7 @@ const handleRestaurantSignup = async (event) => {
         phoneNumber: document.getElementById('phoneNumber').value.trim(),
         description: document.getElementById('description').value.trim(),
         address: document.getElementById('address').value.trim(),
-        imageUrl: "" // Backend string beklediği için boş string gönderiyoruz
+        imageUrl: base64Image // sending the base64 image string
     };
 
     try {
@@ -98,19 +98,23 @@ signupForm.addEventListener('submit', handleRestaurantSignup);
     
     showPreview(file);
   });
+  let base64Image = "";
 
   // 3. review
   function showPreview(file) {
     if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        imgPreview.src = e.target.result;
-        dropArea.classList.add('has-image'); // hide icon with css
-      }
-      
-      reader.readAsDataURL(file);
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            imgPreview.src = e.target.result;
+            dropArea.classList.add('has-image');
+            
+            // BURASI KRİTİK: Resmi uzun bir string'e (Base64) çevirdik
+            base64Image = e.target.result; 
+        }
+        
+        reader.readAsDataURL(file);
     } else {
-      alert("Choose a picture!");
+        alert("Choose a picture!");
     }
-  }
+}
