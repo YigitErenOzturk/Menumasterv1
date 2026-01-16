@@ -502,10 +502,11 @@ document.addEventListener('DOMContentLoaded', () => {
     renderReservationsView('pending');
 });
 
-async function renderReviewsView() {
+
+  async function renderReviewsView() {
   DOM.mainContent.innerHTML = `
     <div class="p-6">
-      <h2 class="text-xl font-bold mb-4">Customer Reviews</h2>
+      <h2 class="text-3xl font-bold mb-4 text-gray-800">Customer Reviews</h2>
       <div id="reviewsList" class="text-gray-500">Loading reviews...</div>
     </div>
   `;
@@ -513,26 +514,34 @@ async function renderReviewsView() {
   const listEl = document.getElementById("reviewsList");
 
   try {
-    // ÖRN: restaurantId'yi nereden tutuyorsan oradan al
-    const restaurantId = window.currentRestaurantId; // <- bunu kendi projene göre değiştir
-    const token = localStorage.getItem("token");     // <- auth varsa
-
-    const res = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}/reviews`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    });
-
-    if (!res.ok) {
-      throw new Error(`API error: ${res.status}`);
+    const restaurantId = localStorage.getItem("restaurantId");
+    if (!restaurantId) {
+      listEl.innerHTML = `<div class="text-red-600 font-bold">restaurantId localStorage'da yok.</div>`;
+      return;
     }
 
-    const reviews = await res.json(); 
-    // example: [{rating, comment, userName, createdAt}, ...]
+    let data = await fetchData(`${API_CONFIG.ENDPOINTS.REVIEWS}?restaurantId=${encodeURIComponent(restaurantId)}`);
+    if (data?.error) throw new Error(data.message || "Failed to fetch reviews");
 
-    if (!Array.isArray(reviews) || reviews.length === 0) {
+    let reviews =
+      Array.isArray(data) ? data :
+      Array.isArray(data.reviews) ? data.reviews :
+      Array.isArray(data.data) ? data.data :
+      [];
+
+    // (opsiyonel) A boşsa B'yi dene
+    if (!reviews.length) {
+      data = await fetchData(`restaurants/${restaurantId}/reviews`);
+      if (!data?.error) {
+        reviews =
+          Array.isArray(data) ? data :
+          Array.isArray(data.reviews) ? data.reviews :
+          Array.isArray(data.data) ? data.data :
+          [];
+      }
+    }
+
+    if (!reviews.length) {
       listEl.innerHTML = `<div class="text-gray-500">No reviews yet.</div>`;
       return;
     }
@@ -540,10 +549,10 @@ async function renderReviewsView() {
     listEl.innerHTML = `
       <div class="space-y-4">
         ${reviews.map(r => `
-          <div class="border border-gray-200 rounded-lg p-4">
+          <div class="border border-gray-200 rounded-lg p-4 bg-white">
             <div class="flex items-center justify-between">
-              <div class="font-semibold">${escapeHtml(r.userName || "Anonymous")}</div>
-              <div class="text-sm text-gray-500">${formatDate(r.createdAt)}</div>
+              <div class="font-semibold">${escapeHtml(r.userName || r.user?.name || "Anonymous")}</div>
+              <div class="text-sm text-gray-500">${formatDate(r.createdAt || r.createdDate || r.date)}</div>
             </div>
 
             <div class="mt-2 text-sm">
@@ -552,7 +561,7 @@ async function renderReviewsView() {
               <span class="text-gray-500">(${r.rating ?? "-"})</span>
             </div>
 
-            <p class="mt-2 text-gray-700">${escapeHtml(r.comment || "")}</p>
+            <p class="mt-2 text-gray-700">${escapeHtml(r.comment || r.text || r.message || "")}</p>
           </div>
         `).join("")}
       </div>
@@ -560,9 +569,15 @@ async function renderReviewsView() {
   } catch (err) {
     console.error(err);
     listEl.innerHTML = `
-      <div class="text-red-600">
-        Reviews couldnt download. (${escapeHtml(String(err.message || err))})
+      <div class="text-red-600 font-bold">
+        Reviews couldn't load: ${escapeHtml(String(err.message || err))}
       </div>
     `;
   }
+}
+
+function renderStars(rating) {
+  const n = Math.max(0, Math.min(5, Number(rating) || 0));
+  const rr = Math.round(n);
+  return `<span class="text-yellow-500">${"★".repeat(rr)}</span><span class="text-gray-300">${"☆".repeat(5 - rr)}</span>`;
 }
