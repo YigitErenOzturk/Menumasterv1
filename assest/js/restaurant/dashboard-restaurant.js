@@ -513,11 +513,10 @@ async function renderReviewsView() {
   const listEl = document.getElementById("reviewsList");
 
   try {
-    // ÖRN: restaurantId'yi nereden tutuyorsan oradan al
-    const restaurantId = window.currentRestaurantId; // <- bunu kendi projene göre değiştir
+    const resId = localStorage.getItem('restaurantId');
     const token = localStorage.getItem("token");     // <- auth varsa
 
-    const res = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}/reviews`, {
+    const res = await fetch(`http://localhost:5000/api/reviews/restaurant/${resId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
