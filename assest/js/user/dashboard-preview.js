@@ -10,7 +10,7 @@ const API_CONFIG = {
     RESTAURANTS_POPULAR: '/restaurants/popular',
     RESTAURANTS_ALL: '/restaurants/all',
     RESERVATIONS: '/reservations',
-    REVIEWS: '/reviews',
+    REVIEWS: '/reviews/my-reviews',
   }
 };
 
@@ -276,21 +276,147 @@ const renderReservationsView = async () => {
 };
 
 const renderReviewsView = async () => {
-  DOM.mainContent.innerHTML = `<div class="animate-fade-in"><h1 class="text-3xl font-bold text-white mb-6">My Reviews</h1><div id="reviews-list" class="space-y-4">Loading...</div></div>`;
-  const reviews = await fetchData('reviews');
-  const listEl = document.getElementById('reviews-list');
+    DOM.mainContent.innerHTML = `
+    <div class="animate-fade-in">
+      <h1 class="text-3xl font-bold text-white mb-6">My Reviews</h1>
+      <div id="reviews-list" class="space-y-4">
+        <div class="flex justify-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div></div>
+      </div>
+    </div>`;
 
-  if (reviews.error || !Array.isArray(reviews) || reviews.length === 0) {
-    listEl.innerHTML = `<p class="text-center text-gray-400 py-8 text-gray-400">No reviews written yet.</p>`;
-    return;
-  }
+    const reviews = await fetchDataWithAuth('reviews/my-reviews');
+    const listEl = document.getElementById('reviews-list');
 
-  listEl.innerHTML = reviews.map(rev => `
-    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-      <h3 class="text-lg font-bold text-indigo-400">${escapeHtml(rev.restaurantName)}</h3>
-      <p class="text-gray-300 mt-2">"${escapeHtml(rev.comment)}"</p>
-    </div>
-  `).join('');
+    if (reviews.error || !Array.isArray(reviews) || reviews.length === 0) {
+        listEl.innerHTML = `<p class="text-center text-gray-400 py-8">No reviews written yet.</p>`;
+        return;
+    }
+
+    listEl.innerHTML = reviews.map(rev => {
+        const stars = '⭐'.repeat(rev.rating || 0);
+        const reviewDate = new Date(rev.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+
+        return `
+        <div id="review-card-${rev.id}" class="bg-gray-800 p-6 rounded-2xl border border-gray-700 hover:border-indigo-500/50 transition-colors shadow-xl">
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <h3 class="text-xl font-bold text-indigo-400">${escapeHtml(rev.restaurantName)}</h3>
+              <div class="text-yellow-500 mt-1 text-sm">${stars}</div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="editReviewInline(${rev.id}, ${rev.rating}, '${escapeHtml(rev.comment)}')" class="p-2 text-gray-400 hover:text-yellow-500 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                </button>
+                <button onclick="deleteReview(${rev.id})" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+            </div>
+          </div>
+          <p id="review-text-${rev.id}" class="text-gray-300 italic leading-relaxed text-lg">"${escapeHtml(rev.comment)}"</p>
+        </div>
+      `;}).join('');
+};
+const deleteReview = async (id) => {
+    if (!confirm('Are you sure you want to delete this review?')) return;
+
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+    
+    try {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/reviews/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            document.getElementById(`review-card-${id}`).remove();
+            // Eğer liste boşaldıysa sayfayı yenileyebilirsin
+        } else {
+            alert('Could not delete review.');
+        }
+    } catch (error) {
+        console.error("Delete review error:", error);
+    }
+};
+
+let currentEditRating = 0;
+const editReviewInline = (id, oldRating, oldComment) => {
+    currentEditRating = oldRating; // Mevcut rating'i başlat
+    const card = document.getElementById(`review-card-${id}`);
+
+    card.innerHTML = `
+        <div class="animate-fade-in bg-orange-50/50 p-6 rounded-2xl border border-orange-100 shadow-inner">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Edit Your Review</h3>
+            
+            <div class="flex items-center space-x-1 mb-4" id="star-container-${id}">
+                ${[1, 2, 3, 4, 5].map(num => `
+                    <svg onclick="updateStarSelection(${id}, ${num})" 
+                         id="star-${id}-${num}"
+                         class="star-btn w-8 h-8 ${num <= oldRating ? 'text-yellow-500' : 'text-gray-300'}" 
+                         fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                `).join('')}
+            </div>
+
+            <div class="mb-4">
+                <textarea id="edit-comment-${id}" 
+                    placeholder="Share your experience..."
+                    class="w-full p-4 bg-white border border-gray-200 rounded-xl text-gray-800 outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"
+                    rows="4">${oldComment}</textarea>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="saveReview(${id})" 
+                    class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition-all active:scale-95">
+                    Update Review
+                </button>
+                <button onclick="renderReviewsView()" 
+                    class="text-gray-500 hover:text-gray-700 font-medium px-4 py-2 transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    `;
+};
+const updateStarSelection = (reviewId, rating) => {
+    currentEditRating = rating;
+    for (let i = 1; i <= 5; i++) {
+        const star = document.getElementById(`star-${reviewId}-${i}`);
+        if (i <= rating) {
+            star.classList.remove('text-gray-300');
+            star.classList.add('text-yellow-500');
+        } else {
+            star.classList.remove('text-yellow-500');
+            star.classList.add('text-gray-300');
+        }
+    }
+};
+
+const saveReview = async (id) => {
+    const newComment = document.getElementById(`edit-comment-${id}`).value;
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+
+    try {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/reviews/${id}`, {
+            method: 'PUT',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                rating: currentEditRating, // Dinamik seçilen yıldız değeri
+                comment: newComment 
+            })
+        });
+
+        if (response.ok) {
+            renderReviewsView(); 
+        } else {
+            alert('Failed to update review.');
+        }
+    } catch (error) {
+        console.error("Update error:", error);
+    }
 };
 
 // --- SETTINGS VIEW ---
