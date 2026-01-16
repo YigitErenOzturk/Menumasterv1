@@ -480,6 +480,8 @@ const handleNavigation = (e) => {
         case 'menu': renderMenuView(); break;
         case 'settings': renderSettingsView(); break;
         case 'reviews':
+            renderReviewsView();
+  break;
         case 'tickets':
             DOM.mainContent.innerHTML = `<div class="p-8 text-center text-gray-500">Feature coming soon!</div>`;
             break;
@@ -499,3 +501,68 @@ document.addEventListener('DOMContentLoaded', () => {
     setRestaurantInfo();
     renderReservationsView('pending');
 });
+
+async function renderReviewsView() {
+  DOM.mainContent.innerHTML = `
+    <div class="p-6">
+      <h2 class="text-xl font-bold mb-4">Customer Reviews</h2>
+      <div id="reviewsList" class="text-gray-500">Loading reviews...</div>
+    </div>
+  `;
+
+  const listEl = document.getElementById("reviewsList");
+
+  try {
+    // ÖRN: restaurantId'yi nereden tutuyorsan oradan al
+    const restaurantId = window.currentRestaurantId; // <- bunu kendi projene göre değiştir
+    const token = localStorage.getItem("token");     // <- auth varsa
+
+    const res = await fetch(`${API_BASE_URL}/restaurants/${restaurantId}/reviews`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`API error: ${res.status}`);
+    }
+
+    const reviews = await res.json(); 
+    // example: [{rating, comment, userName, createdAt}, ...]
+
+    if (!Array.isArray(reviews) || reviews.length === 0) {
+      listEl.innerHTML = `<div class="text-gray-500">No reviews yet.</div>`;
+      return;
+    }
+
+    listEl.innerHTML = `
+      <div class="space-y-4">
+        ${reviews.map(r => `
+          <div class="border border-gray-200 rounded-lg p-4">
+            <div class="flex items-center justify-between">
+              <div class="font-semibold">${escapeHtml(r.userName || "Anonymous")}</div>
+              <div class="text-sm text-gray-500">${formatDate(r.createdAt)}</div>
+            </div>
+
+            <div class="mt-2 text-sm">
+              <span class="font-semibold">Rating:</span>
+              <span>${renderStars(r.rating)}</span>
+              <span class="text-gray-500">(${r.rating ?? "-"})</span>
+            </div>
+
+            <p class="mt-2 text-gray-700">${escapeHtml(r.comment || "")}</p>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  } catch (err) {
+    console.error(err);
+    listEl.innerHTML = `
+      <div class="text-red-600">
+        Reviews couldnt download. (${escapeHtml(String(err.message || err))})
+      </div>
+    `;
+  }
+}
