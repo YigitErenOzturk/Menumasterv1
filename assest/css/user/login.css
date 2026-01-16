@@ -11,18 +11,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- Custom Scrollbar --- */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-thumb {
-    background-color: #4338ca; /* A slightly deeper indigo for contrast */
-    border-radius: 10px;
-    border: 2px solid #1f2937; /* Add a track-colored border for a thinner look */
-}
-::-webkit-scrollbar-track {
-    background: #1f2937; /* Gray-800 */
-}
 
 /* --- Form Inputs Styling --- */
 input {

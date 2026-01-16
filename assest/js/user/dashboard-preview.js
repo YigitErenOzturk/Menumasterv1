@@ -160,14 +160,14 @@ const createRestaurantCards = (restaurants) => {
   return restaurants.map(r => {
     const badgeText = r.rating ? `⭐ ${r.rating}` : 'New';
     return `
-      <a href="../restaurantfiles/restaurant-details.html?id=${r.id}&name=${encodeURIComponent(r.name)}" class="block bg-gray-800 rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300 group">
-        <div class="relative h-48 overflow-hidden">
+<a href="../restaurantfiles/restaurant-details.html?id=${r.id}&name=${encodeURIComponent(r.name)}" 
+   class="block bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300 group border-2 border-transparent hover:border-orange-600">        <div class="relative h-48 overflow-hidden">
           <img src="${r.imageUrl || 'https://placehold.co/400x200?text=Restaurant'}" alt="${escapeHtml(r.name)}" class="w-full h-full object-cover group-hover:opacity-75 transition-opacity">
-          <div class="absolute top-2 right-2 bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md">${badgeText}</div>
+          <div class="absolute top-2 right-2 bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md">${badgeText}</div>
         </div>
         <div class="p-4">
-          <h3 class="text-lg font-semibold text-indigo-400 truncate">${escapeHtml(r.name)}</h3>
-          <p class="text-gray-400 text-sm mt-1 uppercase tracking-wider text-xs">${escapeHtml(r.cuisine || 'Global')}</p>
+          <h3 class="text-lg font-semibold text-black truncate">${escapeHtml(r.name)}</h3>
+          <p class="text-gray-600 text-sm mt-2 uppercase tracking-wider text-xs">${escapeHtml(r.address || 'Global')}</p>
         </div>
       </a>
     `;
@@ -189,7 +189,7 @@ const renderDashboardView = async () => {
          text-gray-900 bg-white
          border border-gray-300
          rounded-lg
-         focus:ring-indigo-500 focus:border-indigo-500
+         focus:ring-orange-500 focus:border-orange-500
          transition-colors outline-none">
           <option value="">All Cities (Popular)</option>
           <option value="">Warsaw</option>
@@ -199,7 +199,7 @@ const renderDashboardView = async () => {
         </select>
       </div>
       <div id="restaurant-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <div class="col-span-4 flex justify-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div></div>
+        <div class="col-span-4 flex justify-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div></div>
       </div>
     </div>`;
 
@@ -211,7 +211,7 @@ const renderDashboardView = async () => {
 
   const loadRestaurants = async (filter = '') => {
     const grid = document.getElementById('restaurant-grid');
-    grid.innerHTML = '<div class="col-span-4 flex justify-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div></div>';
+    grid.innerHTML = '<div class="col-span-4 flex justify-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div></div>';
 
     const endpointPath = filter ? `restaurants?city=${encodeURIComponent(filter)}` : 'restaurants/all';
     let restaurants = await fetchData(endpointPath);
@@ -229,7 +229,7 @@ const renderReservationsView = async () => {
     <div class="animate-fade-in">
       <h1 class="text-3xl font-bold text-white mb-6 uppercase tracking-tight">My Reservations</h1>
       <div id="reservations-list" class="grid grid-cols-1 gap-4">
-        <div class="flex justify-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div></div>
+        <div class="flex justify-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div></div>
       </div>
     </div>`;
 
@@ -257,20 +257,20 @@ const renderReservationsView = async () => {
         'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'; // Pending için sarı
     
     return `
-    <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-indigo-500/50 transition-colors shadow-xl">
+    <div class="bg-white p-6 rounded-2xl border border-orange-600 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-orange-500/50 transition-colors shadow-xl">
       <div class="flex items-center gap-4">
-        <div class="w-12 h-12 bg-indigo-600/20 rounded-xl flex items-center justify-center text-indigo-400">
+        <div class="w-12 h-12 bg-orange-600/20 rounded-xl flex items-center justify-center text-orange-400">
            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m4 0h1m-5 4h1m4 0h1m-5 4h1m4 0h1" /></svg>
         </div>
         <div>
-          <h3 class="text-xl font-bold text-white">${escapeHtml(res.restaurantName)}</h3>
+          <h3 class="text-xl font-bold text-black">${escapeHtml(res.restaurantName)}</h3>
           <div class="flex items-center gap-3 mt-1">
-            <span class="text-gray-400 text-sm flex items-center gap-1">
+            <span class="text-gray-800 text-sm flex items-center gap-1">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               ${new Date(res.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </span>
-            <span class="text-gray-500">•</span>
-            <span class="text-gray-400 text-sm">${res.peopleCount} People</span>
+            <span class="text-gray-800">•</span>
+            <span class="text-gray-800 text-sm">${res.peopleCount} People</span>
           </div>
         </div>
       </div>
@@ -294,7 +294,7 @@ const renderReviewsView = async () => {
     <div class="animate-fade-in">
       <h1 class="text-3xl font-bold text-white mb-6">My Reviews</h1>
       <div id="reviews-list" class="space-y-4">
-        <div class="flex justify-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div></div>
+        <div class="flex justify-center py-12"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div></div>
       </div>
     </div>`;
 
@@ -311,14 +311,14 @@ const renderReviewsView = async () => {
         const reviewDate = new Date(rev.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
 
         return `
-        <div id="review-card-${rev.id}" class="bg-gray-800 p-6 rounded-2xl border border-gray-700 hover:border-indigo-500/50 transition-colors shadow-xl">
+        <div id="review-card-${rev.id}" class="bg-gray p-6 rounded-2xl border border-orange-600 hover:border-orange-500/50 transition-colors shadow-xl">
           <div class="flex justify-between items-start mb-3">
             <div>
-              <h3 class="text-xl font-bold text-indigo-400">${escapeHtml(rev.restaurantName)}</h3>
+              <h3 class="text-xl font-bold text-black">${escapeHtml(rev.restaurantName)}</h3>
               <div class="text-yellow-500 mt-1 text-sm">${stars}</div>
             </div>
             <div class="flex gap-2">
-                <button onclick="editReviewInline(${rev.id}, ${rev.rating}, '${escapeHtml(rev.comment)}')" class="p-2 text-gray-400 hover:text-yellow-500 transition-colors">
+                <button onclick="editReviewInline(${rev.id}, ${rev.rating}, '${escapeHtml(rev.comment)}')" class="p-2 text-black hover:text-yellow-500 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                 </button>
                 <button onclick="deleteReview(${rev.id})" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
@@ -326,7 +326,7 @@ const renderReviewsView = async () => {
                 </button>
             </div>
           </div>
-          <p id="review-text-${rev.id}" class="text-gray-300 italic leading-relaxed text-lg">"${escapeHtml(rev.comment)}"</p>
+          <p id="review-text-${rev.id}" class="text-black italic leading-relaxed text-lg">"${escapeHtml(rev.comment)}"</p>
         </div>
       `;}).join('');
 };
@@ -456,7 +456,7 @@ const renderSettingsView = async () => {
       <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-gray-700 pb-6">
         <div>
           <h1 class="text-3xl font-bold text-orange uppercase tracking-tight">Account Settings</h1>
-          <div class="flex items-center gap-2 mt-2 text-indigo-400">
+          <div class="flex items-center gap-2 mt-2 text-orange-600">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
             <span class="text-xs font-semibold uppercase tracking-widest">Member Since: ${registrationDate}</span>
           </div>
@@ -589,9 +589,9 @@ const attachSettingsListeners = (userId, userEmail) => {
 const handleNavigation = (e) => {
   e.preventDefault();
   Object.values(DOM.navLinks).forEach(l => {
-    if (l) l.classList.remove('bg-indigo-600', 'text-white', 'font-semibold');
+    if (l) l.classList.remove('bg-orange-600', 'text-white', 'font-semibold');
   });
-  e.currentTarget.classList.add('bg-indigo-600', 'text-white', 'font-semibold');
+  e.currentTarget.classList.add('bg-orange-600', 'text-white', 'font-semibold');
 
   const viewMap = {
     'nav-dashboard': renderDashboardView,
