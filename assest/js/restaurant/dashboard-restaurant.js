@@ -5,7 +5,7 @@ const API_CONFIG = {
     ENDPOINTS: {
         MENU: 'restaurants/menu',
         RESERVATIONS: 'restaurants/reservations',
-        REVIEWS: 'restaurants/reviews',
+        REVIEWS: 'reviews/restaurant/',
         TICKETS: 'restaurants/tickets',
         GET_INFO: () => `restaurants/${localStorage.getItem("restaurantId")}`,
         UPDATE: (id) => `restaurants/update/${id}`
@@ -211,10 +211,10 @@ const renderMenuView = async () => {
             onchange="toggleCategoryInput(this.value)" required>
             <option value="" disabled selected>Select Category</option>
             ${dynamicCategories.map((cat, index) => {
-    // index çift ise (0, 2, 4...) beyaz, tek ise (1, 3, 5...) turuncu
-    const bgColor = index % 2 === 0 ? '#ffffff' : '#fff7ed'; 
-    return `<option value="${cat}" style="background-color: ${bgColor}; color: #9a3412; padding: 10px;">${cat}</option>`;
-}).join('')}
+                // index çift ise (0, 2, 4...) beyaz, tek ise (1, 3, 5...) turuncu
+                const bgColor = index % 2 === 0 ? '#ffffff' : '#fff7ed';
+                return `<option value="${cat}" style="background-color: ${bgColor}; color: #9a3412; padding: 10px;">${cat}</option>`;
+            }).join('')}
             <option value="NEW_CATEGORY" class="font-bold text-orange-600 bg-white border-t border-orange-200">+ Add New Category</option>
         </select>
         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-orange-600">
@@ -481,7 +481,7 @@ const handleNavigation = (e) => {
         case 'settings': renderSettingsView(); break;
         case 'reviews':
             renderReviewsView();
-  break;
+            break;
         case 'tickets':
             DOM.mainContent.innerHTML = `<div class="p-8 text-center text-gray-500">Feature coming soon!</div>`;
             break;
@@ -502,47 +502,46 @@ document.addEventListener('DOMContentLoaded', () => {
     renderReservationsView('pending');
 });
 
+
 async function renderReviewsView() {
-  DOM.mainContent.innerHTML = `
+    DOM.mainContent.innerHTML = `
     <div class="p-6">
-      <h2 class="text-xl font-bold mb-4">Customer Reviews</h2>
+      <h2 class="text-3xl font-bold mb-4 text-gray-800">Customer Reviews</h2>
       <div id="reviewsList" class="text-gray-500">Loading reviews...</div>
     </div>
   `;
 
-  const listEl = document.getElementById("reviewsList");
+    const listEl = document.getElementById("reviewsList");
 
-  try {
-    const resId = localStorage.getItem('restaurantId');
-    const token = localStorage.getItem("token");     // <- auth varsa
+    try {
+        const restaurantId = localStorage.getItem("restaurantId");
+        if (!restaurantId) {
+            listEl.innerHTML = `<div class="text-red-600 font-bold">restaurantId localStorage'da yok.</div>`;
+            return;
+        }
 
-    const res = await fetch(`http://localhost:5000/api/reviews/restaurant/${resId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    });
+        let data = await fetchData(`${API_CONFIG.ENDPOINTS.REVIEWS}${restaurantId}`);
+        if (data?.error) throw new Error(data.message || "Failed to fetch reviews");
 
-    if (!res.ok) {
-      throw new Error(`API error: ${res.status}`);
-    }
+        let reviews =
+            Array.isArray(data) ? data :
+                Array.isArray(data.reviews) ? data.reviews :
+                    Array.isArray(data.data) ? data.data :
+                        [];
 
-    const reviews = await res.json(); 
-    // example: [{rating, comment, userName, createdAt}, ...]
 
-    if (!Array.isArray(reviews) || reviews.length === 0) {
-      listEl.innerHTML = `<div class="text-gray-500">No reviews yet.</div>`;
-      return;
-    }
+        if (!reviews.length) {
+            listEl.innerHTML = `<div class="text-gray-500">No reviews yet.</div>`;
+            return;
+        }
 
-    listEl.innerHTML = `
+        listEl.innerHTML = `
       <div class="space-y-4">
         ${reviews.map(r => `
-          <div class="border border-gray-200 rounded-lg p-4">
+          <div class="border border-gray-200 rounded-lg p-4 bg-white">
             <div class="flex items-center justify-between">
-              <div class="font-semibold">${escapeHtml(r.userName || "Anonymous")}</div>
-              <div class="text-sm text-gray-500">${formatDate(r.createdAt)}</div>
+              <div class="font-semibold">${escapeHtml(r.userName || r.user?.name || "Anonymous")}</div>
+              <div class="text-sm text-gray-500">${formatDate(r.createdAt || r.createdDate || r.date)}</div>
             </div>
 
             <div class="mt-2 text-sm">
@@ -551,17 +550,23 @@ async function renderReviewsView() {
               <span class="text-gray-500">(${r.rating ?? "-"})</span>
             </div>
 
-            <p class="mt-2 text-gray-700">${escapeHtml(r.comment || "")}</p>
+            <p class="mt-2 text-gray-700">${escapeHtml(r.comment || r.text || r.message || "")}</p>
           </div>
         `).join("")}
       </div>
     `;
-  } catch (err) {
-    console.error(err);
-    listEl.innerHTML = `
-      <div class="text-red-600">
-        Reviews couldnt download. (${escapeHtml(String(err.message || err))})
+    } catch (err) {
+        console.error(err);
+        listEl.innerHTML = `
+      <div class="text-red-600 font-bold">
+        Reviews couldn't load: ${escapeHtml(String(err.message || err))}
       </div>
     `;
-  }
+    }
+}
+
+function renderStars(rating) {
+    const n = Math.max(0, Math.min(5, Number(rating) || 0));
+    const rr = Math.round(n);
+    return `<span class="text-yellow-500">${"★".repeat(rr)}</span><span class="text-gray-300">${"☆".repeat(5 - rr)}</span>`;
 }
