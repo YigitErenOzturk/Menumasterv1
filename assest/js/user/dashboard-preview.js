@@ -177,11 +177,25 @@ const createRestaurantCards = (restaurants) => {
 const renderDashboardView = async () => {
   DOM.mainContent.innerHTML = `
     <div class="animate-fade-in">
-      <h1 class="text-3xl font-bold text-white mb-6">Discover Restaurants</h1>
+<h1 class="text-3xl font-bold text-orange-500 mb-6">Discover Restaurants</h1>
       <div class="mb-8">
-        <label for="city-select" class="text-sm font-medium text-gray-300">Filter by City:</label>
-        <select id="city-select" class="mt-2 w-full max-w-sm p-3 text-gray-100 bg-gray-800 border border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition-colors outline-none">
+        <label for="city-select" class="text-sm font-medium text-gray-900">
+  Filter by City:
+</label>
+
+<select
+  id="city-select"
+  class="mt-2 w-full max-w-sm p-3
+         text-gray-900 bg-white
+         border border-gray-300
+         rounded-lg
+         focus:ring-indigo-500 focus:border-indigo-500
+         transition-colors outline-none">
           <option value="">All Cities (Popular)</option>
+          <option value="">Warsaw</option>
+          <option value="">Krakow</option>
+          <option value="">Gdansk</option>
+          <option value="">Poznan</option>
         </select>
       </div>
       <div id="restaurant-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -227,10 +241,10 @@ const renderReservationsView = async () => {
   
   if (reservations.error || !Array.isArray(reservations) || reservations.length === 0) {
     listEl.innerHTML = `
-      <div class="text-center py-16 bg-gray-800/50 rounded-2xl border-2 border-dashed border-gray-700">
-        <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-        <p class="text-gray-400 text-lg">You don't have any reservations yet.</p>
-        <button onclick="document.getElementById('nav-dashboard').click()" class="mt-4 text-indigo-400 hover:text-indigo-300 font-bold">Discover Restaurants →</button>
+<div class="text-center py-16 bg-white/90 rounded-2xl border-2 border-dashed border-orange-400">
+  <svg class="w-16 h-16 text-orange-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <p class="text-orange-600 text-lg">You don't have any reservations yet.</p>
+<button onclick="document.getElementById('nav-dashboard').click()"class="mt-4 text-orange-500 hover:text-orange-600 font-bold"">Discover Restaurants →</button>
       </div>`;
     return;
   }
@@ -315,7 +329,7 @@ const renderSettingsView = async () => {
     <div class="animate-fade-in max-w-4xl mx-auto p-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-gray-700 pb-6">
         <div>
-          <h1 class="text-3xl font-bold text-white uppercase tracking-tight">Account Settings</h1>
+          <h1 class="text-3xl font-bold text-orange uppercase tracking-tight">Account Settings</h1>
           <div class="flex items-center gap-2 mt-2 text-indigo-400">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
             <span class="text-xs font-semibold uppercase tracking-widest">Member Since: ${registrationDate}</span>
@@ -324,48 +338,49 @@ const renderSettingsView = async () => {
       </div>
       
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-2 space-y-6">
-          <div class="bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-2xl">
-            <h2 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
-              <span class="w-2 h-6 bg-indigo-500 rounded-full"></span> Profile Information
-            </h2>
-            <form id="settings-form" class="space-y-5">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Full Name</label>
-                  <input type="text" id="set-name" value="${escapeHtml(userData.name)}" class="w-full p-3 bg-gray-900 border border-gray-700 rounded-xl text-white outline-none">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Username</label>
-                  <input type="text" id="set-username" value="${escapeHtml(userData.username)}" class="w-full p-3 bg-gray-900 border border-gray-700 rounded-xl text-white outline-none">
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Email Address</label>
-                <input type="email" id="set-email" value="${escapeHtml(userData.email)}" class="w-full p-3 bg-gray-900 border border-gray-700 rounded-xl text-white outline-none">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Phone Number</label>
-                <input type="text" id="set-phone" value="${escapeHtml(userData.phoneNumber || '')}" class="w-full p-3 bg-gray-900 border border-gray-700 rounded-xl text-white outline-none">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Address</label>
-                <textarea id="set-address" rows="3" class="w-full p-3 bg-gray-900 border border-gray-700 rounded-xl text-white outline-none resize-none">${escapeHtml(userData.address || '')}</textarea>
-              </div>
-              <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 rounded-xl transition-all">SAVE CHANGES</button>
-            </form>
-            <div id="settings-message" class="mt-4 text-center font-bold text-sm"></div>
+  <div class="lg:col-span-2 space-y-6">
+    <div class="bg-white p-8 rounded-2xl border border-orange-400 shadow-2xl">
+      <h2 class="text-lg font-bold text-orange-500 mb-6 flex items-center gap-2">
+        <span class="w-2 h-6 bg-orange-500 rounded-full"></span> Profile Information
+      </h2>
+      <form id="settings-form" class="space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Full Name</label>
+            <input type="text" id="set-name" value="${escapeHtml(userData.name)}" class="w-full p-3 bg-gray-100 border border-orange-300 rounded-xl text-gray-900 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Username</label>
+            <input type="text" id="set-username" value="${escapeHtml(userData.username)}" class="w-full p-3 bg-gray-100 border border-orange-300 rounded-xl text-gray-900 outline-none">
           </div>
         </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Email Address</label>
+          <input type="email" id="set-email" value="${escapeHtml(userData.email)}" class="w-full p-3 bg-gray-100 border border-orange-300 rounded-xl text-gray-900 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Phone Number</label>
+          <input type="text" id="set-phone" value="${escapeHtml(userData.phoneNumber || '')}" class="w-full p-3 bg-gray-100 border border-orange-300 rounded-xl text-gray-900 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Address</label>
+          <textarea id="set-address" rows="3" class="w-full p-3 bg-gray-100 border border-orange-300 rounded-xl text-gray-900 outline-none resize-none">${escapeHtml(userData.address || '')}</textarea>
+        </div>
+        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 rounded-xl transition-all">SAVE CHANGES</button>
+      </form>
+      <div id="settings-message" class="mt-4 text-center font-bold text-sm text-orange-500"></div>
+    </div>
+  </div>
 
-        <div class="space-y-6">
-          <div class="bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-2xl text-center">
-            <h2 class="text-lg font-bold text-white mb-4 italic">Security</h2>
-            <button id="forgot-pass-btn" class="w-full border-2 border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-bold py-3 rounded-xl transition-all">Send Reset Link</button>
-            <div id="forgot-message" class="mt-4 text-center text-xs font-medium uppercase tracking-widest"></div>
+  <div class="space-y-6">
+    <div class="bg-white p-8 rounded-2xl border border-orange-400 shadow-2xl text-center">
+      <h2 class="text-lg font-bold text-orange-500 mb-4 italic">Security</h2>
+      <button id="forgot-pass-btn" class="w-full border-2 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white font-bold py-3 rounded-xl transition-all">Send Reset Link</button>
+      
           </div>
         </div>
       </div>
+      
     </div>`;
 
   // Listener fonksiyonunu doğru parametrelerle çağırıyoruz
