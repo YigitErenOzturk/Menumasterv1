@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Send opening message if history is empty
         if (chatBody && !chatBody.innerHTML.trim()) {
-            addBotMessage(`Hello! 👋 I'm ${CONFIG.botName}. How can I assist you today? (e.g., "Register", "Track Order", "Discounts")`);
+            addBotMessage(`Hello! 👋 I'm ${CONFIG.botName}. How can I assist you today? (Write Commands To See Options)`);
         }
     }
 
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             {
                 keywords: ["commands", "what can you do"],
-                response: "You can ask me about: **Registering**, **Orders**, **Support**, or just say **Hello**!"
+                response: "contact,support,help,menu,food,list,price,cost,expensive,order,track,register,login"
             },
             {
     keywords: ["login", "sign in", "log in", "account access"],
