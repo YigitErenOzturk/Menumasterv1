@@ -9,64 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="../assest/logo/favicon.ico">
     <link rel="stylesheet" href="../assest/css/common/chatbot.css">
-
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Custom Scrollbar - Warm Gray Tone */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #fff7ed;
-        }
-
-        /* Orange-50 */
-        ::-webkit-scrollbar-thumb {
-            background: #fdba74;
-            border-radius: 4px;
-        }
-
-        /* Orange-300 */
-        ::-webkit-scrollbar-thumb:hover {
-            background: #f97316;
-        }
-
-        /* Orange-500 */
-
-        /* Animations */
-        .animate-fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Sidebar Link Active State - ORANGE THEME */
-        .sidebar-link.active {
-            background-color: #fff7ed;
-            /* Orange 50 */
-            color: #ea580c;
-            /* Orange 600 */
-            border-left: 4px solid #ea580c;
-        }
-
-        .sidebar-link.active svg {
-            color: #ea580c;
-        }
-    </style>
+    <link rel="stylesheet" href="../assest/css/restaurant/dashboard-restaurant.css">
 </head>
 
 <body
@@ -204,7 +147,6 @@
         </div>
     </main>
 
-
     <div class="chat-icon fixed bottom-6 right-6 z-50 cursor-pointer bg-orange-600 p-3 rounded-full hover:bg-orange-700 transition-colors shadow-lg animate-bounce"
         id="chat-icon">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
@@ -231,38 +173,6 @@
 
     <script type="module" src="../assest/js/restaurant/dashboard-restaurant.js"></script>
     <script src="../assest/js/common/chatbot.js" defer></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const helpLink = document.getElementById("help-link");
-
-            if (helpLink) {
-                helpLink.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    let modal = document.getElementById('help-modal');
-
-                    if (!modal) {
-                        const modalHTML = `
-                <div id="help-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
-                    <div class="bg-white rounded-lg shadow-2xl p-6 max-w-md text-center border-t-4 border-orange-500">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-3">Need Help?</h2>
-                        <p class="text-gray-600 mb-4">You can reach us at <span class="text-orange-600 font-medium">support@menumaster.com</span> or chat with our bot!</p>
-                        <button id="close-help-dynamic" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition shadow-md">Close</button>
-                    </div>
-                </div>`;
-                        document.body.insertAdjacentHTML('beforeend', modalHTML);
-                        modal = document.getElementById('help-modal');
-
-                        document.getElementById('close-help-dynamic').addEventListener('click', () => {
-                            modal.classList.add('hidden');
-                        });
-                    }
-
-                    modal.classList.remove("hidden");
-                });
-            }
-        });
-    </script>
 
 </body>
 
