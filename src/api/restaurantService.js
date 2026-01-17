@@ -2,6 +2,7 @@ import api from './axiosInstance.js';
 
 export const restaurantService = {
     getInfo: (id) => api.get(`/restaurants/${id}`),
+    getAll: () => api.get('/restaurants/all'),
     updateRestaurant: (id, payload) => api.put(`/restaurants/update/${id}`, payload),
     getMenu: () => api.get('/restaurants/menu'),
     addMenuItem: (item) => api.post('/restaurants/menu', item),
