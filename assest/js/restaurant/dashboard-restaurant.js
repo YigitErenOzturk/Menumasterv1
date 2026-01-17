@@ -547,25 +547,62 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     listEl.innerHTML = `
-      <div class="space-y-4">
-        ${reviews.map(r => `
-          <div class="border border-gray-200 rounded-lg p-4 bg-white">
-            <div class="flex items-center justify-between">
-              <div class="font-semibold">${escapeHtml(r.userName || r.user?.name || "Anonymous")}</div>
-              <div class="text-sm text-gray-500">${formatDate(r.createdAt || r.createdDate || r.date)}</div>
+  <div class="flex items-center justify-between mb-5">
+    <div>
+      <p class="text-sm text-gray-500 uppercase tracking-widest font-bold">Total Reviews</p>
+      <p class="text-2xl font-black text-gray-800">${reviews.length}</p>
+    </div>
+
+    <div class="flex items-center gap-2 bg-orange-50 border border-orange-200 text-orange-700 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+      </svg>
+      Customer Feedback
+    </div>
+  </div>
+
+  <div class="space-y-4">
+    ${reviews.map(r => {
+      const user = escapeHtml(r.userName || r.user?.name || "Anonymous");
+      const date = formatDate(r.createdAt || r.createdDate || r.date);
+      const rating = Number(r.rating) || 0;
+
+      const badge =
+        rating >= 4 ? 'bg-green-50 text-green-700 border-green-200' :
+        rating >= 3 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+        'bg-red-50 text-red-700 border-red-200';
+
+      return `
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition p-5">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center font-black text-orange-700">
+                ${user.charAt(0).toUpperCase()}
+              </div>
+
+              <div>
+                <p class="font-black text-gray-800">${user}</p>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">${escapeHtml(date)}</p>
+              </div>
             </div>
 
-            <div class="mt-2 text-sm">
-              <span class="font-semibold">Rating:</span>
-              <span>${renderStars(r.rating)}</span>
-              <span class="text-gray-500">(${r.rating ?? "-"})</span>
+            <div class="flex items-center gap-3">
+              <span class="px-3 py-1 rounded-full border text-xs font-black uppercase tracking-widest ${badge}">
+                ${rating}/5
+              </span>
+              <div class="text-sm">${renderStars(r.rating)}</div>
             </div>
-
-            <p class="mt-2 text-gray-700">${escapeHtml(r.comment || r.text || r.message || "")}</p>
           </div>
-        `).join("")}
-      </div>
-    `;
+
+          <div class="mt-4 bg-gray-50 border border-gray-100 rounded-xl p-4 text-gray-700 leading-relaxed">
+            ${escapeHtml(r.comment || r.text || r.message || "No comment.")}
+          </div>
+        </div>
+      `;
+    }).join("")}
+  </div>
+`;
+
   } catch (err) {
     console.error(err);
     listEl.innerHTML = `
@@ -579,5 +616,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderStars(rating) {
   const n = Math.max(0, Math.min(5, Number(rating) || 0));
   const rr = Math.round(n);
-  return `<span class="text-yellow-500">${"★".repeat(rr)}</span><span class="text-gray-300">${"☆".repeat(5 - rr)}</span>`;
+  return `<span class="text-orange-500">${"★".repeat(rr)}</span><span class="text-gray-300">${"☆".repeat(5 - rr)}</span>`;
 }
+
