@@ -7,41 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/x-icon" href="../assest/logo/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assest/css/user/login.css">
-    <link rel="stylesheet" href="../assest/css/common/chatbot.css">
- <style>
-        /* Chatbot Logo */
-        .chat-icon {
-            background-color: #f97316 !important; /* Tailwind orange-500 equivalent */
-        }
-        .chat-icon:hover {
-            background-color: #ea580c !important; /* Tailwind orange-600 equivalent */
-        }
-        /* Chatbot Logo */
-        .chat-header {
-            background-color: #f97316 !important; /* Tailwind orange-500 equivalent */
-            color: white !important;
-        }
-        /* Send Button */
-        #send-btn {
-            background-color: #f97316 !important;
-        }
-        #send-btn:hover {
-            background-color: #ea580c !important;
-        }
-    </style>
 
-    <style>
-        /* Fade In Animation for the Card */
-        .fade-in-card {
-            animation: fadeIn 0.6s ease-out forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    <link rel="stylesheet" href="../assest/css/user/login.css">
+    <link rel="stylesheet" href="../assest/css/user/login-extra.css">
+    <link rel="stylesheet" href="../assest/css/common/chatbot.css">
 </head>
+
 <body class="bg-orange-50 text-gray-800 min-h-screen flex flex-col selection:bg-orange-200 selection:text-orange-900 relative">
 
     <div class="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-orange-200/40 rounded-full blur-3xl pointer-events-none z-0"></div>
@@ -67,13 +38,13 @@
             <p class="text-center text-gray-500 mb-8 text-sm">Please enter your details to sign in.</p>
             
             <form id="login-form" class="space-y-6">
-                <!-- Username or Email Input -->
                 <div>
                     <label for="email" class="text-sm font-bold text-gray-700">Email</label>
                     <input id="email" name="usernameOrEmail" type="text" autocomplete="email" required
                            class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
                            placeholder="you@example.com">
                 </div>
+
                 <div>
                     <div class="flex justify-between items-center">
                         <label for="password" class="text-sm font-bold text-gray-700">Password</label>
@@ -83,17 +54,14 @@
                            class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
                            placeholder="••••••••">
                 </div>
+
                 <div>
-                    <label class="flex items-center gap-2 text-black-200 text-sm">
-                        <input
-                        type="checkbox"
-                        id="isRestaurant"
-                        class="accent-orange-500"
-                        >
+                    <label class="flex items-center gap-2 text-gray-300 text-sm">
+                        <input type="checkbox" id="isRestaurant" class="accent-indigo-500">
                         Login as a Restaurant
                     </label>
-                    </div>
-                <!-- Error/Success Message Placeholder -->
+                </div>
+
                 <div id="message-display" class="text-sm text-center h-5"></div>
 
                 <div>
@@ -113,6 +81,7 @@
 
     <footer class="text-center py-8 border-t border-orange-200 bg-white/80 rounded-t-3xl mt-8 backdrop-blur-sm relative z-10">
         <div class="flex justify-center space-x-8 mb-6">
+            <!-- social icons (aynı) -->
             <a href="https://facebook.com" target="_blank" class="text-gray-400 hover:text-blue-600 transition-colors duration-300 transform hover:scale-110">
                 <span class="sr-only">Facebook</span>
                 <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -135,23 +104,23 @@
             </a>
         </div>
 
-         <div class="chat-icon shadow-lg hover:shadow-xl transition-all duration-300 z-50" id="chat-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.839 8.839 0 01-4.083-.982A.978.978 0 004 16.307V17a1 1 0 01-1-1v-2.143a1 1 0 00-.617-.928A9.01 9.01 0 012 10c0-4.97 4.477-9 10-9s10 4.03 10 9z" clip-rule="evenodd" />
-        </svg>
-    </div>
+        <div class="chat-icon shadow-lg hover:shadow-xl transition-all duration-300 z-50" id="chat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.839 8.839 0 01-4.083-.982A.978.978 0 004 16.307V17a1 1 0 01-1-1v-2.143a1 1 0 00-.617-.928A9.01 9.01 0 012 10c0-4.97 4.477-9 10-9s10 4.03 10 9z" clip-rule="evenodd" />
+            </svg>
+        </div>
 
-    <div class="chat-window z-50 shadow-2xl border border-orange-200 rounded-2xl overflow-hidden" id="chat-window">
-        <div class="chat-header">
-            <h3>MenuMaster Bot</h3>
-            <button id="close-chat" class="close-chat-btn hover:text-orange-200 transition-colors">&times;</button>
+        <div class="chat-window z-50 shadow-2xl border border-orange-200 rounded-2xl overflow-hidden" id="chat-window">
+            <div class="chat-header">
+                <h3>MenuMaster Bot</h3>
+                <button id="close-chat" class="close-chat-btn hover:text-orange-200 transition-colors">&times;</button>
+            </div>
+            <div class="chat-body bg-orange-50" id="chat-body"></div>
+            <div class="chat-footer bg-white border-t border-orange-100">
+                <input type="text" id="chat-input" placeholder="Write A Message....." class="focus:ring-orange-500 focus:border-orange-500">
+                <button id="send-btn" class="transition-colors">Send</button>
+            </div>
         </div>
-        <div class="chat-body bg-orange-50" id="chat-body"></div>
-        <div class="chat-footer bg-white border-t border-orange-100">
-            <input type="text" id="chat-input" placeholder="Write A Message....." class="focus:ring-orange-500 focus:border-orange-500">
-            <button id="send-btn" class="transition-colors">Send</button>
-        </div>
-    </div>
 
         <p class="text-gray-500 text-sm">&copy; 2026 MenuMaster - All rights reserved.</p>
     </footer>
