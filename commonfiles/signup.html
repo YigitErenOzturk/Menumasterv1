@@ -8,15 +8,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/x-icon" href="../assest/logo/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- FIX: quote closed -->
-    <link rel="stylesheet" href="../assest/css/user/signup.css">
-    <link rel="stylesheet" href="../assest/css/user/signup-extra.css">
-
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../assest/css/common/chatbot.css">
-</head>
+    <style>
+        /* Fade In Animation for the Card */
+        .fade-in-card {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
 
-<body class="bg-orange-50 text-gray-800 min-h-screen flex flex-col selection:bg-orange-200 selection:text-orange-900 relative">
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
 
 <body
     class="bg-orange-50 text-gray-800 min-h-screen flex flex-col selection:bg-orange-200 selection:text-orange-900 relative">
@@ -61,35 +73,35 @@
                         class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
                         placeholder="Name Surname">
                 </div>
-
+                <!-- Username -->
                 <div>
                     <label for="username" class="text-sm font-bold text-gray-700">Username</label>
                     <input id="username" name="username" type="text" autocomplete="username" required
                         class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
                         placeholder="Username">
                 </div>
-
+                <!-- Email -->
                 <div>
                     <label for="email" class="text-sm font-bold text-gray-700">Email</label>
                     <input id="email" name="email" type="email" autocomplete="email" required
                         class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
                         placeholder="you@example.com">
                 </div>
-
+                <!-- Phone Number -->
                 <div>
                     <label for="phoneNumber" class="text-sm font-bold text-gray-700">Phone Number</label>
                     <input id="phoneNumber" name="phoneNumber" type="text" autocomplete="phoneNumber" required
                         class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
                         placeholder="Phone Number">
                 </div>
-
+                <!-- Address -->
                 <div>
                     <label for="address" class="text-sm font-bold text-gray-700">Address</label>
                     <input id="address" name="address" type="text" autocomplete="address" required
                         class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
                         placeholder="City">
                 </div>
-
+                <!-- Password Input -->
                 <div>
                     <label for="password" class="text-sm font-bold text-gray-700">Password</label>
                     <input id="password" name="password" type="password" autocomplete="new-password" required
@@ -99,20 +111,21 @@
 
                 <div id="message" class="text-sm text-center h-5 font-medium"></div>
 
-                <div class="space-y-2">
+                <!-- Submit Button -->
+                <div class="flex flex-col gap-4 mt-4">
                     <button type="submit"
                         class="w-full px-6 py-3 bg-orange-600 text-white font-bold rounded-xl hover:bg-orange-700 transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                         Create Account
                     </button>
 
                     <a href="../restaurantfiles/signup-restaurant.html"
-                       class="w-full px-6 py-3 bg-orange-600 text-white font-bold rounded-xl hover:bg-orange-700 transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                        class="w-full px-6 py-3 bg-white border-2 border-orange-600 text-orange-600 font-bold rounded-xl hover:bg-orange-50 transition duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 text-center block">
                         Click here to sign up as a Restaurant
                     </a>
                 </div>
             </form>
-
-            <p class="mt-8 text-center text-sm text-gray-400">
+            <!-- Login Link -->
+            <p class="mt-8 text-center text-sm text-gray-700">
                 Already have an account?
                 <a href="login.html" class="font-bold text-orange-600 hover:text-orange-800 transition-colors">Log
                     in</a>
@@ -123,8 +136,8 @@
     <footer
         class="text-center py-8 border-t border-orange-200 bg-white/80 rounded-t-3xl mt-8 backdrop-blur-sm relative z-10">
         <div class="flex justify-center space-x-8 mb-6">
-            <!-- social icons aynı -->
-            <a href="https://facebook.com" target="_blank" class="text-gray-400 hover:text-blue-600 transition-colors duration-300 transform hover:scale-110">
+            <a href="https://facebook.com" target="_blank"
+                class="text-gray-400 hover:text-blue-600 transition-colors duration-300 transform hover:scale-110">
                 <span class="sr-only">Facebook</span>
                 <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill-rule="evenodd"
@@ -132,7 +145,9 @@
                         clip-rule="evenodd" />
                 </svg>
             </a>
-            <a href="https://instagram.com" target="_blank" class="text-gray-400 hover:text-pink-600 transition-colors duration-300 transform hover:scale-110">
+
+            <a href="https://instagram.com" target="_blank"
+                class="text-gray-400 hover:text-pink-600 transition-colors duration-300 transform hover:scale-110">
                 <span class="sr-only">Instagram</span>
                 <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill-rule="evenodd"
@@ -140,7 +155,9 @@
                         clip-rule="evenodd" />
                 </svg>
             </a>
-            <a href="https://twitter.com" target="_blank" class="text-gray-400 hover:text-gray-900 transition-colors duration-300 transform hover:scale-110">
+
+            <a href="https://twitter.com" target="_blank"
+                class="text-gray-400 hover:text-gray-900 transition-colors duration-300 transform hover:scale-110">
                 <span class="sr-only">Twitter</span>
                 <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path
@@ -156,14 +173,46 @@
             </div>
             <div class="chat-body bg-orange-50" id="chat-body"></div>
             <div class="chat-footer bg-white border-t border-orange-100">
-                <input type="text" id="chat-input" placeholder="Write A Message....." class="focus:ring-orange-500 focus:border-orange-500">
+                <input type="text" id="chat-input" placeholder="Write A Message....."
+                    class="focus:ring-orange-500 focus:border-orange-500">
                 <button id="send-btn" class="transition-colors">Send</button>
             </div>
         </div>
 
+        <style>
+            /* Chatbot Logo */
+            .chat-icon {
+                background-color: #f97316 !important;
+                /* Tailwind orange-500 equivalent */
+            }
+
+            .chat-icon:hover {
+                background-color: #ea580c !important;
+                /* Tailwind orange-600 equivalent */
+            }
+
+            /* Chatbot Logo */
+            .chat-header {
+                background-color: #f97316 !important;
+                /* Tailwind orange-500 equivalent */
+                color: white !important;
+            }
+
+            /* Send Button */
+            #send-btn {
+                background-color: #f97316 !important;
+            }
+
+            #send-btn:hover {
+                background-color: #ea580c !important;
+            }
+        </style>
+
         <div class="chat-icon shadow-lg hover:shadow-xl transition-all duration-300 z-50" id="chat-icon">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.839 8.839 0 01-4.083-.982A.978.978 0 004 16.307V17a1 1 0 01-1-1v-2.143a1 1 0 00-.617-.928A9.01 9.01 0 012 10c0-4.97 4.477-9 10-9s10 4.03 10 9z" clip-rule="evenodd" />
+                <path fill-rule="evenodd"
+                    d="M18 10c0 3.866-3.582 7-8 7a8.839 8.839 0 01-4.083-.982A.978.978 0 004 16.307V17a1 1 0 01-1-1v-2.143a1 1 0 00-.617-.928A9.01 9.01 0 012 10c0-4.97 4.477-9 10-9s10 4.03 10 9z"
+                    clip-rule="evenodd" />
             </svg>
         </div>
 
@@ -178,4 +227,5 @@
     <script src="../assest/js/user/signup.js"></script>
     <script src="../assest/js/common/chatbot.js" defer></script>
 </body>
+
 </html>

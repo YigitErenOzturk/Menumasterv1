@@ -65,26 +65,3 @@ body {
 @media (max-width:700px) {
   #wm-weather-sidebar { display:none; }
 }
-
-@keyframes shakeHard {
-  0%, 100% { transform: translateX(0); }
-  10% { transform: translateX(-4px); }
-  20% { transform: translateX(4px); }
-  30% { transform: translateX(-4px); }
-  40% { transform: translateX(4px); }
-  50% { transform: translateX(-3px); }
-  60% { transform: translateX(3px); }
-  70% { transform: translateX(-2px); }
-  80% { transform: translateX(2px); }
-  90% { transform: translateX(-1px); }
-}
-
-.animate-shake-hard {
-  animation: shakeHard 0.6s ease-in-out 2;
-}
-
-.chat-icon { background-color: #f97316 !important; }
-        .chat-icon:hover { background-color: #ea580c !important; }
-        .chat-header { background-color: #f97316 !important; color: white !important; }
-        #send-btn { background-color: #f97316 !important; }
-        #send-btn:hover { background-color: #ea580c !important; }

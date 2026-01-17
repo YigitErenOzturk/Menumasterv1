@@ -6,7 +6,7 @@ const loginForm = document.getElementById('login-form');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const messageDisplay = document.getElementById('message-display');
-const submitButton = loginForm?.querySelector('button[type="submit"]');
+const submitButton = loginForm.querySelector('button[type="submit"]');
 const isRestaurantCheckbox = document.getElementById('isRestaurant'); // checkbox id
 
 /**
@@ -61,40 +61,41 @@ const handleLogin = async (event) => {
     if (!response.ok) {
       throw new Error(data.message || 'Invalid credentials or server error.');
     }
+// --- ONLINE SUCCESS ---
+console.log('Backendden Gelen Ham Veri:', data);
 
-    // --- ONLINE SUCCESS ---
-    console.log('Backendden Gelen Ham Veri:', data);
+// 1. Temizlik
+localStorage.removeItem("restaurantId");
+localStorage.removeItem("userId");
+localStorage.removeItem("userRole");
 
-    // 1. Temizlik
-    localStorage.removeItem('restaurantId');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userRole');
+// 2. Token Kaydı
+if (data.token) {
+    localStorage.setItem("authToken", data.token);
+}
 
-    // 2. Token Kaydı
-    if (data.token) {
-      localStorage.setItem('authToken', data.token);
-    }
+// 3. Veri Yakalama (Büyük/Küçük Harf Duyarlı!)
+if (isRestaurant) {
+    localStorage.setItem("userRole", "restaurant");
+    
+    const rId = data.restaurantId;
+    localStorage.setItem("restaurantId", rId);
 
-    // 3. Veri Yakalama (Büyük/Küçük Harf Duyarlı!)
-    if (isRestaurant) {
-      localStorage.setItem('userRole', 'restaurant');
+    const rName = data.name;
+    localStorage.setItem("restaurantName", rName); 
+    
+} else {
+    localStorage.setItem("userRole", "user");
+    
+    const uId = data.userId || data.id;
+    localStorage.setItem("userId", uId);
+    
+    const uName = data.name || data.unique_name || "User";
+    localStorage.setItem("userName", uName);
+}
 
-      const rId = data.restaurantId;
-      localStorage.setItem('restaurantId', rId);
+displayMessage('Login successful! Redirecting...', 'success');
 
-      const rName = data.name;
-      localStorage.setItem('restaurantName', rName);
-    } else {
-      localStorage.setItem('userRole', 'user');
-
-      const uId = data.userId || data.id;
-      localStorage.setItem('userId', uId);
-
-      const uName = data.name || data.unique_name || 'User';
-      localStorage.setItem('userName', uName);
-    }
-
-    displayMessage('Login successful! Redirecting...', 'success');
 
     setTimeout(() => {
       window.location.href = redirectUrl;
@@ -137,70 +138,76 @@ const handleLogin = async (event) => {
   }
 };
 
-// --- HELP MODAL LOGIC ---
-const initHelpModal = () => {
-  const helpLink = document.getElementById('help-link');
-  const helpModal = document.getElementById('help-modal');
-  const closeHelp = document.getElementById('close-help');
-
-  if (!helpLink || !helpModal || !closeHelp) return;
-
-  helpLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    helpModal.classList.remove('hidden');
-  });
-
-  closeHelp.addEventListener('click', () => {
-    helpModal.classList.add('hidden');
-  });
-
-  helpModal.addEventListener('click', (e) => {
-    if (e.target === helpModal) {
-      helpModal.classList.add('hidden');
-    }
-  });
-};
-
-// --- CHAT ICON BUBBLE + SHAKE ---
-const initChatBubbleShake = () => {
-  const chatIcon = document.getElementById('chat-icon');
-  if (!chatIcon) return;
-
-  // Create Balloon To Ask "Do you have a question"
-  const bubble = document.createElement('div');
-  bubble.className =
-    'fixed bottom-24 right-20 bg-white text-gray-800 px-4 py-2 rounded-xl shadow-2xl border border-gray-200 text-sm font-bold z-50 transform scale-0 origin-bottom-right transition-transform duration-500 ease-out';
-  bubble.innerHTML = 'Do you need help? 👋';
-
-  const arrow = document.createElement('div');
-  arrow.className =
-    'absolute -bottom-1 right-4 w-3 h-3 bg-white border-b border-r border-gray-200 transform rotate-45';
-  bubble.appendChild(arrow);
-
-  document.body.appendChild(bubble);
-
-  // It will work after 3 Seconds
-  setTimeout(() => {
-    // show balloon
-    bubble.classList.remove('scale-0');
-
-    // shake
-    chatIcon.classList.remove('animate-bounce');
-    chatIcon.classList.add('animate-shake-hard');
-
-    // It will stop to shake after 2 seconds
-    setTimeout(() => {
-      chatIcon.classList.remove('animate-shake-hard');
-    }, 2000);
-  }, 3000);
-};
-
 // --- Event Listener ---
-if (loginForm) {
-  loginForm.addEventListener('submit', handleLogin);
-}
+loginForm.addEventListener('submit', handleLogin);
 
-document.addEventListener('DOMContentLoaded', () => {
-  initHelpModal();
-  initChatBubbleShake();
-});
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const helpLink = document.getElementById("help-link");
+      const helpModal = document.getElementById("help-modal");
+      const closeHelp = document.getElementById("close-help");
+
+      helpLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        helpModal.classList.remove("hidden");
+      });
+
+      closeHelp.addEventListener("click", () => {
+        helpModal.classList.add("hidden");
+      });
+
+      helpModal.addEventListener("click", (e) => {
+        if (e.target === helpModal) {
+          helpModal.classList.add("hidden");
+        }
+      });
+    });
+  //CHATBOT SCRIPTS
+const chatIcon = document.getElementById('chat-icon');
+    
+    if (chatIcon) {
+        // Create Ballon To Ask Do you have a question
+        const bubble = document.createElement('div');
+        // Tailwind Classes
+        bubble.className = "fixed bottom-24 right-20 bg-white text-gray-800 px-4 py-2 rounded-xl shadow-2xl border border-gray-200 text-sm font-bold z-50 transform scale-0 origin-bottom-right transition-transform duration-500 ease-out";
+        bubble.innerHTML = "Do you need help? 👋"; 
+        
+       
+        const arrow = document.createElement('div');
+        arrow.className = "absolute -bottom-1 right-4 w-3 h-3 bg-white border-b border-r border-gray-200 transform rotate-45";
+        bubble.appendChild(arrow);
+        
+        document.body.appendChild(bubble);
+
+        // Shaking Animation
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes shake-hard {
+                0% { transform: rotate(0deg); }
+                25% { transform: rotate(15deg); }
+                50% { transform: rotate(0deg); }
+                75% { transform: rotate(-15deg); }
+                100% { transform: rotate(0deg); }
+            }
+            .animate-shake-hard {
+                animation: shake-hard 0.4s ease-in-out infinite;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // It will work after 3 Seconds
+        setTimeout(() => {
+            // show ballon
+            bubble.classList.remove('scale-0');
+            
+            // shake
+            chatIcon.classList.remove('animate-bounce'); 
+            chatIcon.classList.add('animate-shake-hard');
+            
+            // It will stop to shake after 2 seconds
+            setTimeout(() => {
+                chatIcon.classList.remove('animate-shake-hard');
+            }, 2000);
+
+        }, 3000);
+    }
