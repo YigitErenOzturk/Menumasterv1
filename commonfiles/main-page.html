@@ -1,34 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MenuMaster - Restaurant Booking and Delivery</title> 
+    <title>MenuMaster - Restaurant Booking and Delivery</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-          theme: {
-            extend: {
-              colors: {
-                primary: tailwind.colors.orange,
-              }
+            theme: {
+                extend: {
+                    colors: {
+                        primary: tailwind.colors.orange,
+                    }
+                }
             }
-          }
         }
-      </script>
-    <link rel="icon" type="image/x-icon" href="../assest/logo/favicon.ico">
+    </script>
+    <link rel="icon" type="image/x-icon" href="../assets/logo/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assest/css/common/main-page.css">
+    <link rel="stylesheet" href="../assets/css/common/main-page.css">
+    <link rel="stylesheet" href="../assets/css/common/chatbot.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <link rel="stylesheet" href="../assest/css/common/chatbot.css">
-    
+
     <style>
-        .chat-icon { background-color: #f97316 !important; }
-        .chat-icon:hover { background-color: #ea580c !important; }
-        .chat-header { background-color: #f97316 !important; color: white !important; }
-        #send-btn { background-color: #f97316 !important; }
-        #send-btn:hover { background-color: #ea580c !important; }
+        .chat-icon {
+            background-color: #f97316 !important;
+        }
+
+        .chat-icon:hover {
+            background-color: #ea580c !important;
+        }
+
+        .chat-header {
+            background-color: #f97316 !important;
+            color: white !important;
+        }
+
+        #send-btn {
+            background-color: #f97316 !important;
+        }
+
+        #send-btn:hover {
+            background-color: #ea580c !important;
+        }
     </style>
 </head>
 
@@ -38,101 +54,154 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex-shrink-0">
-                    <a href="main-page.html" class="text-2xl font-extrabold text-orange-600">Menu<span class="text-gray-800">Master</span></a>
+                    <a href="main-page.html" class="text-2xl font-extrabold text-orange-600">Menu<span
+                            class="text-gray-800">Master</span></a>
                 </div>
                 <div class="hidden sm:ml-6 sm:flex sm:space-x-4 items-center">
-                    <a href="login.html" class="text-gray-600 hover:bg-orange-100 hover:text-orange-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Log In</a>
-                    <a href="signup.html" class="bg-orange-500 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-orange-600 transition duration-150 shadow-sm">Sign Up</a>
+                    <a href="login.html"
+                        class="text-gray-600 hover:bg-orange-100 hover:text-orange-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Log
+                        In</a>
+                    <a href="signup.html"
+                        class="bg-orange-500 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-orange-600 transition duration-150 shadow-sm">Sign
+                        Up</a>
                 </div>
-                <button id="mobile-menu-button" type="button" class="sm:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-orange-600 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500">
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                <button id="mobile-menu-button" type="button"
+                    class="sm:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-orange-600 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
             </div>
         </div>
         <div id="mobile-menu" class="sm:hidden hidden px-2 pt-2 pb-3 space-y-1 bg-white border-t border-orange-100">
-            <a href="login.html" class="text-gray-600 hover:bg-orange-100 hover:text-orange-700 block px-3 py-2 rounded-md text-base font-medium">Log In</a>
-            <a href="signup.html" class="bg-orange-500 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-orange-600">Sign Up</a>
+            <a href="login.html"
+                class="text-gray-600 hover:bg-orange-100 hover:text-orange-700 block px-3 py-2 rounded-md text-base font-medium">Log
+                In</a>
+            <a href="signup.html"
+                class="bg-orange-500 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-orange-600">Sign
+                Up</a>
         </div>
     </nav>
 
     <section class="text-center relative overflow-hidden group z-0 mb-12">
-            <div class="absolute inset-0 bg-gradient-to-b from-orange-100 via-white to-orange-50 opacity-100"></div>
-            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-5"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-orange-100 via-white to-orange-50 opacity-100"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-5"></div>
 
-    <div class="relative z-10 py-12 md:py-16 px-4">
-        <div class="max-w-7xl mx-auto">
+        <div class="relative z-10 py-12 md:py-16 px-4">
+            <div class="max-w-7xl mx-auto">
 
-                 <div class="inline-flex items-center mb-8 px-5 py-2 rounded-full bg-white border border-orange-300 text-orange-700 text-sm font-bold shadow-sm animate-pulse-slow">
+                <div
+                    class="inline-flex items-center mb-8 px-5 py-2 rounded-full bg-white border border-orange-300 text-orange-700 text-sm font-bold shadow-sm animate-pulse-slow">
                     <span class="relative flex h-3 w-3 mr-2">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-3 w-3 bg-orange-600"></span>
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-orange-600"></span>
                     </span>
                     <span id="live-counter">-</span>&nbsp;people are looking for food right now
                 </div>
 
-</div>
+            </div>
 
-                <h1 class="text-5xl md:text-7xl font-extrabold text-gray-900 mb-6 leading-tight">
-                    The Quickest Route to Flavor Is <span class="text-orange-600 relative inline-block">Here!
-                        <svg class="absolute bottom-0 left-0 w-full h-3 text-orange-300 -z-10 opacity-60" viewBox="0 0 200 20" preserveAspectRatio="none">
-                            <path d="M0,15 C50,5 150,25 200,15" stroke="currentColor" stroke-width="8" fill="none" stroke-linecap="round" />
-                        </svg>
-                    </span>
-                </h1>
-                <p class="text-xl text-gray-600 font-medium mb-10 max-w-2xl mx-auto">
-                    Discover the most popular restaurants below and book instantly.
-                </p>
+            <h1 class="text-5xl md:text-7xl font-extrabold text-gray-900 mb-6 leading-tight">
+                The Quickest Route to Flavor Is <span class="text-orange-600 relative inline-block">Here!
+                    <svg class="absolute bottom-0 left-0 w-full h-3 text-orange-300 -z-10 opacity-60"
+                        viewBox="0 0 200 20" preserveAspectRatio="none">
+                        <path d="M0,15 C50,5 150,25 200,15" stroke="currentColor" stroke-width="8" fill="none"
+                            stroke-linecap="round" />
+                    </svg>
+                </span>
+            </h1>
+            <p class="text-xl text-gray-600 font-medium mb-10 max-w-2xl mx-auto">
+                Discover the most popular restaurants below and book instantly.
+            </p>
 
-                <div id="restaurant-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left mt-8">
-                    <div class="col-span-full flex flex-col justify-center items-center py-10">
-                         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mb-4"></div>
-                         <p class="text-gray-500 font-medium">Loading best restaurants for you...</p>
-                    </div>
+            <div id="restaurant-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left mt-8">
+                <div class="col-span-full flex flex-col justify-center items-center py-10">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mb-4"></div>
+                    <p class="text-gray-500 font-medium">Loading best restaurants for you...</p>
                 </div>
-                </div>
+            </div>
+        </div>
         </div>
     </section>
 
     <div class="max-w-7xl mx-auto p-4 md:p-8">
 
         <section class="mb-16">
-            <h2 class="text-3xl font-bold border-b-4 border-orange-500 pb-2 mb-8 text-gray-900 inline-block">Featured Deals</h2>
+            <h2 class="text-3xl font-bold border-b-4 border-orange-500 pb-2 mb-8 text-gray-900 inline-block">Featured
+                Deals</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:border-orange-400 transition duration-300 group">
-                    <div class="text-5xl font-extrabold text-red-500 mb-4 group-hover:scale-110 transition-transform">Tasty</div>
+                <div
+                    class="bg-white p-8 rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:border-orange-400 transition duration-300 group">
+                    <div class="text-5xl font-extrabold text-red-500 mb-4 group-hover:scale-110 transition-transform">
+                        Tasty</div>
                     <h3 class="text-2xl font-bold text-gray-800 mb-3">All kind of restaurants!</h3>
                     <p class="text-gray-600 text-base mb-4">Show menus of all restaurants before arriving there.</p>
-                    <a href="#" class="inline-flex items-center text-orange-600 hover:text-orange-800 font-bold text-base">View Restaurants <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></a>
+                    <a href="#"
+                        class="inline-flex items-center text-orange-600 hover:text-orange-800 font-bold text-base">View
+                        Restaurants <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                                clip-rule="evenodd" />
+                        </svg></a>
                 </div>
-                <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:border-green-500 transition duration-300 group">
-                    <div class="text-5xl font-extrabold text-green-500 mb-4 group-hover:scale-110 transition-transform">Fast</div>
+                <div
+                    class="bg-white p-8 rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:border-green-500 transition duration-300 group">
+                    <div class="text-5xl font-extrabold text-green-500 mb-4 group-hover:scale-110 transition-transform">
+                        Fast</div>
                     <h3 class="text-2xl font-bold text-gray-800 mb-3">Super Fast Process</h3>
                     <p class="text-gray-600 text-base mb-4">Click register and make ready your reservation.</p>
-                    <a href="#" class="inline-flex items-center text-orange-600 hover:text-orange-800 font-bold text-base">Fast Restaurants <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></a>
+                    <a href="#"
+                        class="inline-flex items-center text-orange-600 hover:text-orange-800 font-bold text-base">Fast
+                        Restaurants <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                                clip-rule="evenodd" />
+                        </svg></a>
                 </div>
-                <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:border-yellow-500 transition duration-300 group">
-                    <div class="text-5xl font-extrabold text-yellow-500 mb-4 group-hover:scale-110 transition-transform">Affordable</div>
+                <div
+                    class="bg-white p-8 rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:border-yellow-500 transition duration-300 group">
+                    <div
+                        class="text-5xl font-extrabold text-yellow-500 mb-4 group-hover:scale-110 transition-transform">
+                        Affordable</div>
                     <h3 class="text-2xl font-bold text-gray-800 mb-3">See Prices</h3>
                     <p class="text-gray-600 text-base mb-4">Check Menumaster and see all details before arrive.</p>
-                    <a href="../restaurantfiles/signup-restaurant.html" class="inline-flex items-center text-orange-600 hover:text-orange-800 font-bold text-base">Register Now <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></a>
+                    <a href="../restaurantfiles/signup-restaurant.html"
+                        class="inline-flex items-center text-orange-600 hover:text-orange-800 font-bold text-base">Register
+                        Now <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                                clip-rule="evenodd" />
+                        </svg></a>
                 </div>
             </div>
         </section>
 
-        <section class="mb-16 p-10 bg-orange-100/70 rounded-3xl shadow-xl border-2 border-orange-300 relative overflow-hidden">
-             <div class="absolute top-0 right-0 -mt-10 -mr-10 opacity-10">
-                 <svg width="300" height="300" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="#F97316" d="M45.7,-75.3C58.9,-64.6,69.3,-48.8,77.1,-31.3C85,-13.8,90.3,5.4,86.3,22.8C82.3,40.2,69,55.8,53.4,66.9C37.8,78,18.9,84.7,-0.3,85.2C-19.5,85.7,-39,80,-54.1,68.7C-69.2,57.5,-79.9,40.7,-86.1,22.2C-92.3,3.7,-94,-16.5,-86.7,-33.7C-79.4,-50.9,-63.1,-65,-46.8,-74.2C-30.5,-83.4,-15.2,-87.7,1.5,-90.1C18.2,-92.4,36.4,-92.8,45.7,-75.3Z" transform="translate(100 100)" />
-                 </svg>
-             </div>
+        <section
+            class="mb-16 p-10 bg-orange-100/70 rounded-3xl shadow-xl border-2 border-orange-300 relative overflow-hidden">
+            <div class="absolute top-0 right-0 -mt-10 -mr-10 opacity-10">
+                <svg width="300" height="300" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#F97316"
+                        d="M45.7,-75.3C58.9,-64.6,69.3,-48.8,77.1,-31.3C85,-13.8,90.3,5.4,86.3,22.8C82.3,40.2,69,55.8,53.4,66.9C37.8,78,18.9,84.7,-0.3,85.2C-19.5,85.7,-39,80,-54.1,68.7C-69.2,57.5,-79.9,40.7,-86.1,22.2C-92.3,3.7,-94,-16.5,-86.7,-33.7C-79.4,-50.9,-63.1,-65,-46.8,-74.2C-30.5,-83.4,-15.2,-87.7,1.5,-90.1C18.2,-92.4,36.4,-92.8,45.7,-75.3Z"
+                        transform="translate(100 100)" />
+                </svg>
+            </div>
             <div class="relative z-10">
                 <h2 class="text-4xl font-extrabold text-gray-900 mb-4">Are You a Restaurant Owner?</h2>
                 <p class="text-gray-700 mb-8 max-w-2xl text-lg leading-relaxed">
-                    Automate your reservation management, reduce your phone traffic, and reach new customers. Save time with the MenuMaster smart IVR system.
+                    Automate your reservation management, reduce your phone traffic, and reach new customers. Save time
+                    with the MenuMaster smart IVR system.
                 </p>
-                <a href="../restaurantfiles/signup-restaurant.html" class="inline-block px-8 py-4 bg-orange-600 text-white font-bold rounded-xl hover:bg-orange-700 transition duration-300 shadow-md hover:shadow-lg text-lg">
+                <a href="../restaurantfiles/signup-restaurant.html"
+                    class="inline-block px-8 py-4 bg-orange-600 text-white font-bold rounded-xl hover:bg-orange-700 transition duration-300 shadow-md hover:shadow-lg text-lg">
                     Register Now
                 </a>
             </div>
@@ -141,36 +210,56 @@
 
         <footer class="text-center py-12 border-t-2 border-orange-100 bg-white rounded-t-3xl mt-12">
             <p class="text-gray-600 font-medium mb-4">Follow our social media accounts and join our family.</p>
-            
+
             <div class="flex justify-center space-x-8 mb-8">
-                <a href="#" class="text-gray-400 hover:text-blue-600 transition-colors transform hover:scale-110"><svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg></a>
-                <a href="#" class="text-gray-400 hover:text-pink-600 transition-colors transform hover:scale-110"><svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.468.99c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd" /></svg></a>
-                <a href="#" class="text-gray-400 hover:text-gray-900 transition-colors transform hover:scale-110"><svg class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg></a>
+                <a href="#" class="text-gray-400 hover:text-blue-600 transition-colors transform hover:scale-110"><svg
+                        class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd"
+                            d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+                            clip-rule="evenodd" />
+                    </svg></a>
+                <a href="#" class="text-gray-400 hover:text-pink-600 transition-colors transform hover:scale-110"><svg
+                        class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd"
+                            d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.468.99c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+                            clip-rule="evenodd" />
+                    </svg></a>
+                <a href="#" class="text-gray-400 hover:text-gray-900 transition-colors transform hover:scale-110"><svg
+                        class="h-10 w-10" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                    </svg></a>
             </div>
 
-        <div class="text-center py-6 border-t border-gray-200">
-            <p class="text-gray-500 text-sm">&copy; 2026 MenuMaster - Restaurant Booking System. All rights reserved.</p>
-            <div class="mt-4 text-gray-500 text-sm font-medium">
-                <a href="#" id="help-link" class="hover:text-orange-600 mx-2 transition-colors">Help</a>
+            <div class="text-center py-6 border-t border-gray-200">
+                <p class="text-gray-500 text-sm">&copy; 2026 MenuMaster - Restaurant Booking System. All rights
+                    reserved.</p>
+                <div class="mt-4 text-gray-500 text-sm font-medium">
+                    <a href="#" id="help-link" class="hover:text-orange-600 mx-2 transition-colors">Help</a>
+                </div>
             </div>
-        </div>
         </footer>
 
-        <div id="help-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
-          <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md text-center border border-orange-200">
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-4">Need Help?</h2>
-            <p class="text-gray-600 mb-6 text-lg">
-              You can reach us at <span class="text-orange-600 font-bold">support@menumaster.com</span> Our Chatbot always here to help you 7/24 !
-            </p>
-            <button id="close-help" class="px-6 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition shadow-md">
-              Close
-            </button>
-          </div>
+        <div id="help-modal"
+            class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md text-center border border-orange-200">
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-4">Need Help?</h2>
+                <p class="text-gray-600 mb-6 text-lg">
+                    You can reach us at <span class="text-orange-600 font-bold">support@menumaster.com</span> Our
+                    Chatbot always here to help you 7/24 !
+                </p>
+                <button id="close-help"
+                    class="px-6 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition shadow-md">
+                    Close
+                </button>
+            </div>
         </div>
 
     </div>
 
-    <button id="scrollTopBtn" title="Scroll Up" class="fixed bottom-6 right-6 p-4 bg-orange-500 text-white rounded-full shadow-lg opacity-0 transition duration-300 hover:bg-orange-600 focus:outline-none hover:shadow-xl z-40" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    <button id="scrollTopBtn" title="Scroll Up"
+        class="fixed bottom-6 right-6 p-4 bg-orange-500 text-white rounded-full shadow-lg opacity-0 transition duration-300 hover:bg-orange-600 focus:outline-none hover:shadow-xl z-40"
+        onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
         </svg>
@@ -178,7 +267,9 @@
 
     <div class="chat-icon shadow-lg hover:shadow-xl transition-all duration-300 z-50" id="chat-icon">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.839 8.839 0 01-4.083-.982A.978.978 0 004 16.307V17a1 1 0 01-1-1v-2.143a1 1 0 00-.617-.928A9.01 9.01 0 012 10c0-4.97 4.477-9 10-9s10 4.03 10 9z" clip-rule="evenodd" />
+            <path fill-rule="evenodd"
+                d="M18 10c0 3.866-3.582 7-8 7a8.839 8.839 0 01-4.083-.982A.978.978 0 004 16.307V17a1 1 0 01-1-1v-2.143a1 1 0 00-.617-.928A9.01 9.01 0 012 10c0-4.97 4.477-9 10-9s10 4.03 10 9z"
+                clip-rule="evenodd" />
         </svg>
     </div>
 
@@ -189,38 +280,39 @@
         </div>
         <div class="chat-body bg-orange-50" id="chat-body"></div>
         <div class="chat-footer bg-white border-t border-orange-100">
-            <input type="text" id="chat-input" placeholder="Write A Message....." class="focus:ring-orange-500 focus:border-orange-500">
+            <input type="text" id="chat-input" placeholder="Write A Message....."
+                class="focus:ring-orange-500 focus:border-orange-500">
             <button id="send-btn" class="transition-colors">Send</button>
         </div>
     </div>
 
-    <script src="../assest/js/common/main-page.js" defer></script>
-    <script src="../assest/js/common/chatbot.js" defer></script>
+    <script type="module" src="../../src/features/common/main-page.js"></script>
+    <script type="module" src="../../src/features/common/chatbot.js"></script>
 
     <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const helpLink = document.getElementById("help-link");
-      const helpModal = document.getElementById("help-modal");
-      const closeHelp = document.getElementById("close-help");
+        document.addEventListener("DOMContentLoaded", () => {
+            const helpLink = document.getElementById("help-link");
+            const helpModal = document.getElementById("help-modal");
+            const closeHelp = document.getElementById("close-help");
 
-      helpLink.addEventListener("click", (e) => {
-        e.preventDefault();
-        helpModal.classList.remove("hidden");
-      });
+            helpLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                helpModal.classList.remove("hidden");
+            });
 
-      closeHelp.addEventListener("click", () => {
-        helpModal.classList.add("hidden");
-      });
+            closeHelp.addEventListener("click", () => {
+                helpModal.classList.add("hidden");
+            });
 
-      helpModal.addEventListener("click", (e) => {
-        if (e.target === helpModal) {
-          helpModal.classList.add("hidden");
-        }
-      });
-    });
+            helpModal.addEventListener("click", (e) => {
+                if (e.target === helpModal) {
+                    helpModal.classList.add("hidden");
+                }
+            });
+        });
 
     </script>
-    
+
     <!-- <script>
       document.addEventListener('DOMContentLoaded', async () => {
         const listElement = document.getElementById('restaurant-list');
@@ -268,4 +360,5 @@
     </script> -->
 
 </body>
+
 </html>
