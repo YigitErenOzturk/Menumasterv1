@@ -13,18 +13,12 @@ const searchBtn = document.getElementById('search-btn');
 const liveCounter = document.getElementById('live-counter');
 const scrollTopBtn = document.getElementById('scrollTopBtn');
 
-/**
- * XSS Koruması için escape fonksiyonu
- */
 const localEscapeHtml = (str) => {
     if (!str) return "";
     const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
     return str.replace(/[&<>"']/g, (m) => map[m]);
 };
 
-/**
- * Restoranları Ekrana Basar
- */
 const renderRestaurants = (restaurants, isShowingMore = false) => {
     if (!listEl) return;
 
