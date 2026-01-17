@@ -1,15 +1,15 @@
 // --- CONFIGURASYON ---
 const API_CONFIG = {
-  BASE_URL: 'http://localhost:5000/api',
-  CATEGORIES: ['Starter', 'Main Course', 'Drinks', 'Desserts', 'Salads'],
-  ENDPOINTS: {
-    MENU: 'restaurants/menu',
-    RESERVATIONS: 'restaurants/reservations',
-    REVIEWS: 'restaurants/reviews',
-    TICKETS: 'restaurants/tickets',
-    GET_INFO: () => `restaurants/${localStorage.getItem("restaurantId")}`,
-    UPDATE: (id) => `restaurants/update/${id}`,
-  },
+    BASE_URL: 'http://localhost:5000/api',
+    CATEGORIES: ['Starter', 'Main Course', 'Drinks', 'Desserts', 'Salads'],
+    ENDPOINTS: {
+        MENU: 'restaurants/menu',
+        RESERVATIONS: 'restaurants/reservations',
+        REVIEWS: 'reviews/restaurant/',
+        TICKETS: 'restaurants/tickets',
+        GET_INFO: () => `restaurants/${localStorage.getItem("restaurantId")}`,
+        UPDATE: (id) => `restaurants/update/${id}`
+    }
 };
 
 // --- DOM Elements ---
@@ -662,42 +662,24 @@ window.renderReviewsView = async function renderReviewsView()  {
     </div>
   `;
 
-  const listEl = document.getElementById("reviewsList");
+    const listEl = document.getElementById("reviewsList");
 
-  try {
-    const restaurantId = localStorage.getItem("restaurantId");
-    if (!restaurantId) {
-      listEl.innerHTML = `<div class="text-red-600 font-bold">restaurantId localStorage'da yok.</div>`;
-      return;
-    }
+    try {
+        const restaurantId = localStorage.getItem("restaurantId");
+        if (!restaurantId) {
+            listEl.innerHTML = `<div class="text-red-600 font-bold">restaurantId localStorage'da yok.</div>`;
+            return;
+        }
 
-    let data = await fetchData(
-      `${API_CONFIG.ENDPOINTS.REVIEWS}?restaurantId=${encodeURIComponent(restaurantId)}`
-    );
-    if (data?.error) throw new Error(data.message || "Failed to fetch reviews");
+        let data = await fetchData(`${API_CONFIG.ENDPOINTS.REVIEWS}${restaurantId}`);
+        if (data?.error) throw new Error(data.message || "Failed to fetch reviews");
 
-    let reviews =
-      Array.isArray(data) ? data :
-      Array.isArray(data.reviews) ? data.reviews :
-      Array.isArray(data.data) ? data.data :
-      [];
+        let reviews =
+            Array.isArray(data) ? data :
+                Array.isArray(data.reviews) ? data.reviews :
+                    Array.isArray(data.data) ? data.data :
+                        [];
 
-    // (opsiyonel) A boşsa B'yi dene
-    if (!reviews.length) {
-      data = await fetchData(`restaurants/${restaurantId}/reviews`);
-      if (!data?.error) {
-        reviews =
-          Array.isArray(data) ? data :
-          Array.isArray(data.reviews) ? data.reviews :
-          Array.isArray(data.data) ? data.data :
-          [];
-      }
-    }
-
-    if (!reviews.length) {
-      listEl.innerHTML = `<div class="text-gray-500">No reviews yet.</div>`;
-      return;
-    }
 
     listEl.innerHTML = `
       <div class="flex items-center justify-between mb-5">
@@ -757,14 +739,14 @@ window.renderReviewsView = async function renderReviewsView()  {
           .join("")}
       </div>
     `;
-  } catch (err) {
-    console.error(err);
-    listEl.innerHTML = `
+    } catch (err) {
+        console.error(err);
+        listEl.innerHTML = `
       <div class="text-red-600 font-bold">
         Reviews couldn't load: ${escapeHtml(String(err.message || err))}
       </div>
     `;
-  }
+    }
 }
 
 function renderStars(rating) {

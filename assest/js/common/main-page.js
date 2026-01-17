@@ -9,35 +9,35 @@ const escapeHtml = (text) => {
   return div.innerHTML;
 };
 
-(function () {
-  // 1. Private State
-  let visibleCount = 6;
-  let allRestaurants = [];
-  const API_URL = 'https://your-api-endpoint.com/api/restaurants'; // REPLACE THIS WITH YOUR URL
+(function() {
+    // 1. Private State
+    let visibleCount = 6;
+    let allRestaurants = [];
+    const API_URL = 'http://localhost:5000/api/restaurants/all'; // REPLACE THIS WITH YOUR URL
 
-  // 2. Private Utility
-  const localEscapeHtml = (str) => {
-    if (!str) return "";
-    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-    return str.replace(/[&<>"']/g, (m) => map[m]);
-  };
+    // 2. Private Utility
+    const localEscapeHtml = (str) => {
+        if (!str) return "";
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return str.replace(/[&<>"']/g, (m) => map[m]);
+    };
 
-  // 3. Load More Logic
-  const loadMore = () => {
-    visibleCount += 6;
-    renderRestaurants(allRestaurants, true);
-  };
+    // 3. Load More Logic
+    const loadMore = () => {
+        visibleCount += 4;
+        renderRestaurants(allRestaurants, true);
+    };
 
-  const updateButtonVisibility = () => {
-    const listEl = document.getElementById('restaurant-list');
-    let btnContainer = document.getElementById('show-more-container');
-
-    if (!btnContainer && listEl) {
-      btnContainer = document.createElement('div');
-      btnContainer.id = 'show-more-container';
-      btnContainer.className = 'col-span-full flex justify-center mt-10 mb-10';
-      listEl.after(btnContainer);
-    }
+    const updateButtonVisibility = () => {
+        const listEl = document.getElementById('restaurant-list');
+        let btnContainer = document.getElementById('show-more-container');
+        
+        if (!btnContainer && listEl) {
+            btnContainer = document.createElement('div');
+            btnContainer.id = 'show-more-container';
+            btnContainer.className = 'col-span-full flex justify-center mt-10 mb-10';
+            listEl.after(btnContainer);
+        }
 
     if (visibleCount < allRestaurants.length) {
       btnContainer.innerHTML = `
