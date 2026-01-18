@@ -244,7 +244,7 @@ const API_BASE_URL = 'http://localhost:5000/api';
           </div>
 
           <div class="lg:col-span-1 space-y-8">
-            <aside class="bg-white p-6 rounded-2xl shadow-lg border border-orange-100 sticky top-24">
+            <aside class="bg-white p-6 rounded-2xl shadow-lg border border-orange-100">
               <h2 class="text-2xl font-bold text-gray-900 mb-4 border-b-2 border-orange-500 pb-2 inline-block">Contact & Info</h2>
 
               <div class="map-container shadow-inner border border-gray-200">
@@ -256,32 +256,45 @@ const API_BASE_URL = 'http://localhost:5000/api';
                 <li class="flex items-center"><span class="font-medium">📞 ${escapeHtml(data.phoneNumber || 'N/A')}</span></li>
               </ul>
             </aside>
-
             <aside class="bg-orange-100/50 p-6 rounded-2xl shadow-lg border-2 border-orange-300">
-              <h2 class="text-2xl font-bold text-gray-900 mb-4">Make a Reservation</h2>
-              <form id="reservation-form" class="space-y-4">
-                <div>
-                  <label class="block text-sm font-bold text-gray-700 mb-1">Number of People</label>
-                  <input type="number" id="people" value="2" min="1"
-                         class="w-full p-3 border border-orange-200 rounded-xl outline-none" required>
-                </div>
-                <div>
-                  <label class="block text-sm font-bold text-gray-700 mb-1">Date</label>
-                  <input type="date" id="date"
-                         class="w-full p-3 border border-orange-200 rounded-xl outline-none" required>
-                </div>
-                <div>
-                  <label class="block text-sm font-bold text-gray-700 mb-1">Time</label>
-                  <input type="time" id="time"
-                         class="w-full p-3 border border-orange-200 rounded-xl outline-none" required>
-                </div>
-                <button type="submit"
-                        class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl transition shadow-md">
-                  Book a Table
-                </button>
-                <p id="form-message" class="text-center mt-2 h-5 font-medium"></p>
-              </form>
-            </aside>
+  <h2 class="text-2xl font-bold text-gray-900 mb-4">Make a Reservation</h2>
+
+  ${
+    !isLoggedIn
+      ? `
+        <div class="bg-white/70 p-4 rounded-xl border border-orange-200">
+          <p class="text-gray-700 font-medium">
+            Please <a class="text-orange-700 font-bold underline" href="../commonfiles/login.html">log in</a>
+            to make a reservation.
+          </p>
+        </div>
+      `
+      : `
+        <form id="reservation-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-1">Number of People</label>
+            <input type="number" id="people" value="2" min="1"
+                   class="w-full p-3 border border-orange-200 rounded-xl outline-none" required>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-1">Date</label>
+            <input type="date" id="date"
+                   class="w-full p-3 border border-orange-200 rounded-xl outline-none" required>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-1">Time</label>
+            <input type="time" id="time"
+                   class="w-full p-3 border border-orange-200 rounded-xl outline-none" required>
+          </div>
+          <button type="submit"
+                  class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl transition shadow-md">
+            Book a Table
+          </button>
+          <p id="form-message" class="text-center mt-2 h-5 font-medium"></p>
+        </form>
+      `
+      }
+       </aside>           
           </div>
         </div>
       `;
@@ -475,4 +488,17 @@ const API_BASE_URL = 'http://localhost:5000/api';
         menu: menuItems,
         reviews: reviewsData
       });
+
+      const getAuthToken = () =>
+    localStorage.getItem("authToken") || localStorage.getItem("token");
+
+  document.getElementById("back-dashboard-link")?.addEventListener("click", (e) => {
+    const token = getAuthToken();
+
+    if (!token) {
+      e.preventDefault();
+      window.location.href = "../commonfiles/main-page.html"; // If you are not login it will send you back to main page
+    }
+  });
     });
+
