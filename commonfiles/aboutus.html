@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MenuMaster - About Us</title>
+
+  <!-- Tailwind (senin main-page gibi) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primary: tailwind.colors.orange }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- About CSS (BURASI HEAD İÇİNDE OLMAK ZORUNDA) -->
+  <link rel="stylesheet" href="../assets/css/common/aboutus.css">
+</head>
+
+<body class="bg-orange-50 text-gray-900 min-h-screen selection:bg-orange-200 selection:text-orange-900">
+
+  <!-- Simple Navbar -->
+  <nav class="bg-white shadow-md sticky top-0 z-20 border-b border-orange-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <a href="main-page.html" class="text-2xl font-extrabold text-orange-600">
+          Menu<span class="text-gray-800">Master</span>
+        </a>
+
+        <div class="flex gap-3">
+          <a href="main-page.html"
+             class="text-gray-600 hover:bg-orange-100 hover:text-orange-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            Home
+          </a>
+          <a href="login.html"
+             class="text-gray-600 hover:bg-orange-100 hover:text-orange-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+            Log In
+          </a>
+          <a href="../userfiles/signup.html"
+             class="bg-orange-500 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-orange-600 transition duration-150 shadow-sm">
+            Sign Up
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ABOUT + FAQ -->
+  <section id="about" class="max-w-6xl mx-auto px-4 py-16">
+    <!-- ABOUT -->
+    <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-8 md:p-10">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 section-title">
+        About <span class="text-orange-500">MenuMaster</span>
+      </h2>
+      <p class="mt-6 text-gray-600 leading-relaxed">
+        MenuMaster is a discovery platform that helps you find restaurants faster and smarter.
+        Filter by city, explore menus, and pick the best spot for your next meal — all in one place.
+      </p>
+
+      <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="about-card rounded-2xl border border-gray-100 p-6 bg-orange-50/40">
+          <h3 class="font-bold text-gray-900 text-lg">Our Mission</h3>
+          <p class="mt-2 text-gray-600">
+            Make restaurant discovery simple: clear menus, real ratings, and quick decisions.
+          </p>
+        </div>
+
+        <div class="about-card rounded-2xl border border-gray-100 p-6 bg-orange-50/40">
+          <h3 class="font-bold text-gray-900 text-lg">Why MenuMaster?</h3>
+          <ul class="mt-2 text-gray-600 list-disc pl-5 space-y-1">
+            <li>City-based filtering</li>
+            <li>Clean restaurant cards & fast browsing</li>
+            <li>Always improving with user feedback</li>
+          </ul>
+        </div>
+
+        <div class="about-card rounded-2xl border border-gray-100 p-6 bg-orange-50/40">
+          <h3 class="font-bold text-gray-900 text-lg">Our Promise</h3>
+          <p class="mt-2 text-gray-600">
+            No clutter. No confusion. Just the info you need to choose where to eat.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div id="faq" class="mt-10 bg-white rounded-2xl shadow-md border border-gray-100 p-8 md:p-10">
+      <div class="flex items-end justify-between gap-4 flex-wrap">
+        <h2 class="text-3xl font-extrabold text-gray-900 section-title">FAQ</h2>
+        <p class="text-gray-500">Frequently asked questions about MenuMaster</p>
+      </div>
+
+      <div class="mt-6 space-y-4">
+        <details class="group rounded-xl border border-gray-100 p-5">
+          <summary class="cursor-pointer list-none flex items-center justify-between font-bold text-gray-900">
+            How does MenuMaster get restaurant data?
+            <span class="ml-4 text-orange-500 group-open:rotate-180 transition-transform">⌄</span>
+          </summary>
+          <p class="mt-3 text-gray-600 leading-relaxed">
+            We fetch restaurant details from our API and display them in a clean, searchable format.
+            This includes menu links, ratings, and location information when available.
+          </p>
+        </details>
+
+        <details class="group rounded-xl border border-gray-100 p-5">
+          <summary class="cursor-pointer list-none flex items-center justify-between font-bold text-gray-900">
+            Can I filter restaurants by city?
+            <span class="ml-4 text-orange-500 group-open:rotate-180 transition-transform">⌄</span>
+          </summary>
+          <p class="mt-3 text-gray-600 leading-relaxed">
+            Yes. Use the city filter to quickly narrow down restaurants based on your selected city.
+          </p>
+        </details>
+
+        <details class="group rounded-xl border border-gray-100 p-5">
+          <summary class="cursor-pointer list-none flex items-center justify-between font-bold text-gray-900">
+            Do I need an account to use MenuMaster?
+            <span class="ml-4 text-orange-500 group-open:rotate-180 transition-transform">⌄</span>
+          </summary>
+          <p class="mt-3 text-gray-600 leading-relaxed">
+            No account is required for browsing. You can explore restaurants and view menus instantly.
+          </p>
+        </details>
+
+        <details class="group rounded-xl border border-gray-100 p-5">
+          <summary class="cursor-pointer list-none flex items-center justify-between font-bold text-gray-900">
+            What if a restaurant has missing info (image/city/rating)?
+            <span class="ml-4 text-orange-500 group-open:rotate-180 transition-transform">⌄</span>
+          </summary>
+          <p class="mt-3 text-gray-600 leading-relaxed">
+            Some restaurants may not provide complete details. In those cases, MenuMaster shows safe defaults
+            (like a placeholder image) and keeps the listing usable.
+          </p>
+        </details>
+
+        <details class="group rounded-xl border border-gray-100 p-5">
+          <summary class="cursor-pointer list-none flex items-center justify-between font-bold text-gray-900">
+            How can I report an issue or suggest a restaurant?
+            <span class="ml-4 text-orange-500 group-open:rotate-180 transition-transform">⌄</span>
+          </summary>
+          <p class="mt-3 text-gray-600 leading-relaxed">
+            You can contact us via the “Help” or “Contact” section on the site. We review feedback regularly.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <footer class="text-center py-10 border-t border-orange-100 bg-white">
+    <p class="text-gray-500 text-sm">&copy; 2026 MenuMaster. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

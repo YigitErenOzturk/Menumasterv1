@@ -1,0 +1,48 @@
+/* ===========================
+   MenuMaster - About Us CSS
+=========================== */
+
+body {
+  font-family: "Inter", sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* FAQ details animation */
+details {
+  transition: all 0.3s ease;
+}
+
+details[open] summary {
+  color: #f97316;
+}
+
+/* FAQ summary arrow nicer */
+details summary {
+  user-select: none;
+}
+
+/* Card hover effect */
+.about-card:hover {
+  transform: translateY(-4px);
+  transition: 0.3s ease;
+}
+
+/* Section titles underline */
+.section-title {
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: "";
+  display: block;
+  width: 60%;
+  height: 4px;
+  background: #f97316;
+  margin-top: 8px;
+  border-radius: 999px;
+}
