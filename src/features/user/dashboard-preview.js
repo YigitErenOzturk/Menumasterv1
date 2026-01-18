@@ -15,6 +15,11 @@ const DOM = {
         settings: document.getElementById('nav-settings'),
     }
 };
+const polishCities = [
+    "Warszawa", "Krakow", "Poznan", "Wroclaw", "Gdansk",
+    "Lodz", "Szczecin", "Katowice", "Lublin", "Bydgoszcz",
+    "Bialystok", "Gdynia", "Czestochowa", "Radom", "Sosnowiec"
+];
 
 // --- Helper Functions ---
 const escapeHtml = (text) => {
@@ -309,8 +314,19 @@ window.renderSettingsView = async () => {
               <p class="text-orange-600 mb-6 font-semibold">Member Since: ${registrationDate}</p>
               <form id="settings-form" class="bg-white p-8 rounded-2xl border border-orange-400 shadow-2xl space-y-5">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div><label class="block text-xs font-bold uppercase mb-2">Full Name</label><input type="text" id="set-name" value="${escapeHtml(userData.name)}" class="w-full p-3 bg-gray-100 border rounded-xl"></div>
+                  <div><label class="block text-xs font-bold uppercase mb-2">Full Name</label><input type="text" id="set-name" value="${escapeHtml(userData.name)}" class="w-full p-3 bg-gray-100 border rounded-xl"></div>           
                   <div><label class="block text-xs font-bold uppercase mb-2">Username</label><input type="text" id="set-username" value="${escapeHtml(userData.username)}" class="w-full p-3 bg-gray-300 text-gray-500 border rounded-xl cursor-not-allowed" readonly></div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase mb-2">City</label>
+                    <select id="set-city" class="w-full p-3 bg-gray-100 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500 appearance-none cursor-pointer">
+                        <option value="" disabled ${!userData.city ? 'selected' : ''}>Select your city</option>
+                        ${polishCities.map(city => `
+                            <option value="${city}" ${userData.city === city ? 'selected' : ''}>
+                                ${city}
+                            </option>
+                        `).join('')}
+                    </select>
                 </div>
                 <div><label class="block text-xs font-bold uppercase mb-2">Email</label><input type="email" id="set-email" value="${escapeHtml(userData.email)}" class="w-full p-3 bg-gray-300 text-gray-500 border rounded-xl cursor-not-allowed" readonly></div>
                 <div><label class="block text-xs font-bold uppercase mb-2">Phone</label><input type="text" id="set-phone" value="${escapeHtml(userData.phoneNumber || '')}" class="w-full p-3 bg-gray-100 border rounded-xl"></div>
@@ -373,40 +389,51 @@ window.renderSettingsView = async () => {
 
               <div id="settings-message" class="mt-4 text-center font-bold"></div>
             </div>`;
-        attachSettingsListeners(userId, userData.email);
+        attachSettingsListeners(userId, userData);
         attachResetPasswordModal(userData.email);
     } catch (e) {
         console.error("Settings load error", e);
     }
 };
 
-const attachSettingsListeners = (userId, userEmail) => {
+const attachSettingsListeners = (userId, originalUserData) => {
     const settingsForm = document.getElementById('settings-form');
-    if (settingsForm) {
-        settingsForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const msg = document.getElementById('settings-message');
-            const payload = {
-                name: document.getElementById('set-name').value,
-                username: document.getElementById('set-username').value,
-                email: document.getElementById('set-email').value,
-                phoneNumber: document.getElementById('set-phone').value,
-                address: document.getElementById('set-address').value
-            };
+    if (!settingsForm) return;
 
-            try {
-                msg.textContent = "SAVING...";
-                await userService.updateUser(userId, payload);
+    settingsForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById('settings-message');
+
+        const payload = {
+            ...originalUserData,
+            name: document.getElementById('set-name').value.trim(),
+            city: document.getElementById('set-city').value.trim(),
+            phoneNumber: document.getElementById('set-phone').value.trim(),
+            address: document.getElementById('set-address').value.trim(),
+        };
+
+        try {
+            msg.textContent = " SAVING...";
+            msg.className = "mt-4 text-center text-orange-600 font-bold";
+
+            const res = await userService.updateUser(userId, payload);
+
+            if (res.status === 200 || res.status === 204 || !res.data.error) {
                 localStorage.setItem('userName', payload.name);
-                setUserInfo();
-                msg.textContent = "SUCCESSFULLY UPDATED!";
+
+                msg.textContent = "✓ SUCCESSFULLY UPDATED!";
                 msg.className = "mt-4 text-center text-green-600 font-bold";
-            } catch (err) {
-                msg.textContent = "UPDATE FAILED!";
-                msg.className = "mt-4 text-center text-red-500 font-bold";
+
+                setUserInfo();
+
+                setTimeout(() => renderSettingsView(), 2000);
             }
-        });
-    }
+        } catch (err) {
+            console.error("Update error details:", err.response?.data || err);
+            msg.textContent = "❌ UPDATE FAILED! " + (err.response?.data?.message || "");
+            msg.className = "mt-4 text-center text-red-500 font-bold";
+        }
+    });
 };
 
 // --- Navigation & Router ---
