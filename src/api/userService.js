@@ -24,4 +24,9 @@ export const userService = {
     forgotPassword: (email) => api.post('/Auth/forgot-password', { email }),
     register: (userData) => api.post('/users/register', userData),
     login: (credentials) => api.post('/users/login', credentials),
+
+    //cities
+    getCities: () => api.get('/restaurants/cities'),
+    getAllRestaurants: () => api.get('/restaurants/all'),
+    getRestaurantsByCity: (city) => api.get(`/restaurants?city=${encodeURIComponent(city)}`),
 };

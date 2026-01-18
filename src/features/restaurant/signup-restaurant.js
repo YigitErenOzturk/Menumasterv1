@@ -26,7 +26,7 @@ const handleRestaurantSignup = async (event) => {
         name: document.getElementById('restaurantName').value.trim(),
         email: document.getElementById('email').value.trim(),
         password: document.getElementById('password').value.trim(),
-        phoneNumber: document.getElementById('phoneNumber').value.trim(),
+        phoneNumber: document.getElementById('phoneNumber').value.substring(4).replace(/\D/g, ""), // Remove +48 and non-digits
         description: document.getElementById('description').value.trim(),
         address: document.getElementById('address').value.trim(),
         city: document.getElementById('city').value,
@@ -119,5 +119,62 @@ if (dropArea) {
         const file = e.dataTransfer.files[0];
         if (fileInput) fileInput.files = e.dataTransfer.files; 
         showPreview(file);
+    });
+}
+const phoneInput = document.getElementById('phoneNumber');
+
+if (phoneInput) {
+    // 1. Sayfa yüklendiğinde veya inputa tıklandığında +48'i koy
+    const setInitialValue = () => {
+        if (!phoneInput.value.startsWith('+48 ')) {
+            phoneInput.value = '+48 ';
+        }
+    };
+
+    phoneInput.addEventListener('focus', setInitialValue);
+
+    phoneInput.addEventListener('input', (e) => {
+        let value = e.target.value;
+
+        // +48 kısmının silinmesini engelle
+        if (!value.startsWith('+48 ')) {
+            value = '+48 ' + value.replace(/^\+?48?\s?/, "");
+        }
+
+        // +48'den sonrasını temizle (sadece rakamlar)
+        let prefix = "+48 ";
+        let digits = value.substring(4).replace(/\D/g, '').substring(0, 9); // Maximum 9 digits
+        
+        // Polonya 9 hane kuralına göre formatla: (XXX) XXX XXX
+        let formatted = prefix;
+        if (digits.length > 0) {
+            formatted += "(" + digits.substring(0, 3);
+        }
+        if (digits.length > 3) {
+            formatted += ") " + digits.substring(3, 6);
+        }
+        if (digits.length > 6) {
+            formatted += " " + digits.substring(6, 9);
+        }
+
+        e.target.value = formatted;
+    });
+
+    // İmlecin +48'in başına gitmesini engelle, hep sonda kalsın
+    phoneInput.addEventListener('keydown', (e) => {
+        if (e.target.selectionStart < 4 && (e.key === 'Backspace' || e.key === 'Delete')) {
+            // İlk 4 karakteri (+48 ) silmeyi engelle
+            if (e.target.selectionStart <= 4) {
+                e.preventDefault();
+            }
+        }
+    });
+
+    phoneInput.addEventListener('click', (e) => {
+        // Tıklandığında imleç en başa giderse en sona at
+        if (e.target.selectionStart < 4) {
+            const len = e.target.value.length;
+            e.target.setSelectionRange(len, len);
+        }
     });
 }

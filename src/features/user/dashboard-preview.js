@@ -1,6 +1,6 @@
 // --- IMPORTS ---
 import { userService } from '../../api/userService.js';
-import { authService } from '../../api/authService.js'; 
+import { authService } from '../../api/authService.js';
 
 // --- DOM Elements ---
 const DOM = {
@@ -84,6 +84,10 @@ const createRestaurantCards = (restaurants) => {
                 </div>
                 <div class="p-4">
                   <h3 class="text-lg font-semibold text-black truncate">${escapeHtml(r.name)}</h3>
+                   <p class="text-gray-700 text-sm mt-2 flex items-center gap-1">
+    <span class="text-orange-500">📍</span>
+    <span class="font-medium">${escapeHtml(r.city || 'Unknown')}</span>
+  </p>
                   <p class="text-gray-600 text-sm mt-2 uppercase tracking-wider text-xs">${escapeHtml(r.address || 'Global')}</p>
                 </div>
             </a>
@@ -107,11 +111,13 @@ window.renderDashboardView = async () => {
         </div>`;
 
     const citySelect = document.getElementById('city-select');
-    
+
     try {
         const res = await userService.getCities();
         if (Array.isArray(res.data)) {
-            citySelect.innerHTML += res.data.map(city => `<option value="${escapeHtml(city.name)}">${escapeHtml(city.name)}</option>`).join('');
+            citySelect.innerHTML += res.data
+                .map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`)
+                .join('');
         }
     } catch (e) {
         console.error("Cities fetch error", e);
@@ -143,7 +149,7 @@ window.renderReservationsView = async () => {
         </div>`;
 
     const listEl = document.getElementById('reservations-list');
-    
+
     try {
         const response = await userService.getMyReservations();
         const reservations = response.data;
@@ -157,11 +163,11 @@ window.renderReservationsView = async () => {
         }
 
         listEl.innerHTML = reservations.map(res => {
-            const statusClass = 
-                res.status === 'Confirmed' ? 'bg-green-500/10 text-green-400 border-green-500/20' : 
-                res.status === 'Declined' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 
-                'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
-            
+            const statusClass =
+                res.status === 'Confirmed' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                    res.status === 'Declined' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                        'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+
             return `
                 <div class="bg-white p-6 rounded-2xl border border-orange-600 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-orange-500/50 transition-colors shadow-xl">
                   <div class="flex items-center gap-4">
@@ -439,14 +445,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-        const helpLink = document.getElementById("help-link");
+    const helpLink = document.getElementById("help-link");
 
-        if (helpLink) {
-            helpLink.addEventListener("click", (e) => {
-                e.preventDefault();
-                let modal = document.getElementById('help-modal');
-                if (!modal) {
-                    const modalHTML = `
+    if (helpLink) {
+        helpLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            let modal = document.getElementById('help-modal');
+            if (!modal) {
+                const modalHTML = `
                 <div id="help-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
                     <div class="bg-white rounded-lg shadow-2xl p-6 max-w-md text-center border-t-4 border-orange-500">
                         <h2 class="text-2xl font-bold text-gray-800 mb-3">Need Help?</h2>
@@ -454,125 +460,125 @@ document.addEventListener("DOMContentLoaded", () => {
                         <button id="close-help-dynamic" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition shadow-md">Close</button>
                     </div>
                 </div>`;
-                    document.body.insertAdjacentHTML('beforeend', modalHTML);
-                    modal = document.getElementById('help-modal');
-                    document.getElementById('close-help-dynamic').addEventListener('click', () => modal.classList.add('hidden'));
-                }
-                modal.classList.remove("hidden");
-            });
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                modal = document.getElementById('help-modal');
+                document.getElementById('close-help-dynamic').addEventListener('click', () => modal.classList.add('hidden'));
+            }
+            modal.classList.remove("hidden");
+        });
+    }
+});
+
+function attachResetPasswordModal(defaultEmail = "") {
+    const openBtn = document.getElementById("open-reset-modal");
+
+    const fpModal = document.getElementById("fpModal");
+    const fpStep1 = document.getElementById("fpStep1");
+    const fpStep2 = document.getElementById("fpStep2");
+    const fpStep3 = document.getElementById("fpStep3");
+
+    const fpEmail = document.getElementById("fpEmail");
+    const fpCode = document.getElementById("fpCode");
+    const fpNewPass = document.getElementById("fpNewPass");
+    const fpNewPass2 = document.getElementById("fpNewPass2");
+
+    const fpSendCode = document.getElementById("fpSendCode");
+    const fpGoPass = document.getElementById("fpGoPass");
+    const fpResetBtn = document.getElementById("fpResetBtn");
+    const fpClose = document.getElementById("fpClose");
+    const fpMsg = document.getElementById("fpMsg");
+
+    if (!openBtn || !fpModal) return;
+
+    const show = (el) => el.classList.remove("hidden");
+    const hide = (el) => el.classList.add("hidden");
+
+    const showMsg = (text, ok = true) => {
+        fpMsg.textContent = text;
+        fpMsg.className = ok
+            ? "mt-4 text-center text-sm font-semibold text-green-600"
+            : "mt-4 text-center text-sm font-semibold text-red-600";
+    };
+
+    const open = () => {
+        fpEmail.value = defaultEmail || "";
+        fpCode.value = "";
+        fpNewPass.value = "";
+        fpNewPass2.value = "";
+        fpMsg.textContent = "";
+
+        show(fpModal);
+        fpModal.classList.add("flex");
+        fpModal.classList.remove("hidden");
+
+        // step reset
+        show(fpStep1); hide(fpStep2); hide(fpStep3);
+    };
+
+    const close = () => {
+        fpModal.classList.add("hidden");
+        fpModal.classList.remove("flex");
+    };
+
+    openBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        open();
+    });
+
+    fpClose.addEventListener("click", close);
+
+    // click outside closes
+    fpModal.addEventListener("click", (e) => {
+        if (e.target === fpModal) close();
+    });
+
+    // STEP 1: send code
+    fpSendCode.addEventListener("click", async () => {
+        const email = fpEmail.value.trim();
+        if (!email) return showMsg("Email is required.", false);
+
+        try {
+            showMsg("Sending verification code...", true);
+            await authService.forgotPassword(email);
+            showMsg("Verification code sent. Check your email.", true);
+
+            hide(fpStep1); show(fpStep2);
+        } catch (err) {
+            showMsg("Failed to send verification code.", false);
         }
     });
 
-    function attachResetPasswordModal(defaultEmail = "") {
-  const openBtn = document.getElementById("open-reset-modal");
+    // STEP 2: go to password step
+    fpGoPass.addEventListener("click", (e) => {
+        e.preventDefault();
+        const code = fpCode.value.trim();
+        if (!code) return showMsg("Verification code is required.", false);
 
-  const fpModal = document.getElementById("fpModal");
-  const fpStep1 = document.getElementById("fpStep1");
-  const fpStep2 = document.getElementById("fpStep2");
-  const fpStep3 = document.getElementById("fpStep3");
+        showMsg("Code received. Please set a new password.", true);
+        hide(fpStep2); show(fpStep3);
+    });
 
-  const fpEmail = document.getElementById("fpEmail");
-  const fpCode = document.getElementById("fpCode");
-  const fpNewPass = document.getElementById("fpNewPass");
-  const fpNewPass2 = document.getElementById("fpNewPass2");
+    // STEP 3: reset
+    fpResetBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
 
-  const fpSendCode = document.getElementById("fpSendCode");
-  const fpGoPass = document.getElementById("fpGoPass");
-  const fpResetBtn = document.getElementById("fpResetBtn");
-  const fpClose = document.getElementById("fpClose");
-  const fpMsg = document.getElementById("fpMsg");
+        const email = fpEmail.value.trim();
+        const code = fpCode.value.trim();
+        const pass1 = fpNewPass.value;
+        const pass2 = fpNewPass2.value;
 
-  if (!openBtn || !fpModal) return;
+        if (!pass1 || !pass2) return showMsg("Password is required.", false);
+        if (pass1 !== pass2) return showMsg("Passwords do not match.", false);
+        if (pass1.length < 6) return showMsg("Password must be at least 6 characters.", false);
 
-  const show = (el) => el.classList.remove("hidden");
-  const hide = (el) => el.classList.add("hidden");
+        try {
+            showMsg("Resetting password...", true);
+            await authService.resetPassword(code, pass1, email);
+            showMsg("Password reset successful.", true);
 
-  const showMsg = (text, ok = true) => {
-    fpMsg.textContent = text;
-    fpMsg.className = ok
-      ? "mt-4 text-center text-sm font-semibold text-green-600"
-      : "mt-4 text-center text-sm font-semibold text-red-600";
-  };
-
-  const open = () => {
-    fpEmail.value = defaultEmail || "";
-    fpCode.value = "";
-    fpNewPass.value = "";
-    fpNewPass2.value = "";
-    fpMsg.textContent = "";
-
-    show(fpModal);
-    fpModal.classList.add("flex");
-    fpModal.classList.remove("hidden");
-
-    // step reset
-    show(fpStep1); hide(fpStep2); hide(fpStep3);
-  };
-
-  const close = () => {
-    fpModal.classList.add("hidden");
-    fpModal.classList.remove("flex");
-  };
-
-  openBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    open();
-  });
-
-  fpClose.addEventListener("click", close);
-
-  // click outside closes
-  fpModal.addEventListener("click", (e) => {
-    if (e.target === fpModal) close();
-  });
-
-  // STEP 1: send code
-  fpSendCode.addEventListener("click", async () => {
-    const email = fpEmail.value.trim();
-    if (!email) return showMsg("Email is required.", false);
-
-    try {
-      showMsg("Sending verification code...", true);
-      await authService.forgotPassword(email);
-      showMsg("Verification code sent. Check your email.", true);
-
-      hide(fpStep1); show(fpStep2);
-    } catch (err) {
-      showMsg("Failed to send verification code.", false);
-    }
-  });
-
-  // STEP 2: go to password step
-  fpGoPass.addEventListener("click", (e) => {
-    e.preventDefault();
-    const code = fpCode.value.trim();
-    if (!code) return showMsg("Verification code is required.", false);
-
-    showMsg("Code received. Please set a new password.", true);
-    hide(fpStep2); show(fpStep3);
-  });
-
-  // STEP 3: reset
-  fpResetBtn.addEventListener("click", async (e) => {
-    e.preventDefault();
-
-    const email = fpEmail.value.trim();
-    const code = fpCode.value.trim();
-    const pass1 = fpNewPass.value;
-    const pass2 = fpNewPass2.value;
-
-    if (!pass1 || !pass2) return showMsg("Password is required.", false);
-    if (pass1 !== pass2) return showMsg("Passwords do not match.", false);
-    if (pass1.length < 6) return showMsg("Password must be at least 6 characters.", false);
-
-    try {
-      showMsg("Resetting password...", true);
-      await authService.resetPassword(code, pass1, email);
-      showMsg("Password reset successful.", true);
-
-      setTimeout(close, 800);
-    } catch (err) {
-      showMsg("Password reset failed.", false);
-    }
-  });
+            setTimeout(close, 800);
+        } catch (err) {
+            showMsg("Password reset failed.", false);
+        }
+    });
 }
