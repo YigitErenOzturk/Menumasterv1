@@ -56,7 +56,7 @@ const renderRestaurants = (restaurants, isShowingMore = false) => {
 };
 
 /**
- * "Daha Fazla Göster" Butonu Mantığı
+ *  Logic of the button show more
  */
 const updateButtonVisibility = () => {
     let btnContainer = document.getElementById('show-more-container');
@@ -83,7 +83,7 @@ const updateButtonVisibility = () => {
 };
 
 /**
- * API'den Veri Çekme (Refactored to Service)
+ * API Call
  */
 const fetchAllRestaurants = async () => {
     if (listEl) listEl.innerHTML = '<p class="col-span-full text-center text-gray-500 py-10 animate-pulse">Loading...</p>';
@@ -97,7 +97,7 @@ const fetchAllRestaurants = async () => {
 };
 
 /**
- * Canlı Sayaç
+ * Counter
  */
 const updateLiveCounter = () => {
     if (!liveCounter) return;
@@ -117,11 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
         else scrollTopBtn?.classList.add('opacity-0');
     });
 
-    // Arama Butonu
+    // Search Button
     searchBtn?.addEventListener('click', async () => {
         const city = locationInput?.value.trim();
         const cuisine = cuisineInput?.value.trim();
-        // Arama servisini buraya ekleyebilirsin
         console.log("Searching for:", city, cuisine);
     });
 });
