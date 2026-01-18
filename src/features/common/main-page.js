@@ -24,7 +24,7 @@ const renderRestaurants = (restaurants, isShowingMore = false) => {
 
     if (!isShowingMore) {
         allRestaurants = restaurants || [];
-        visibleCount = 6;
+        visibleCount = 4;
     }
 
     if (!allRestaurants || allRestaurants.length === 0) {
@@ -36,7 +36,7 @@ const renderRestaurants = (restaurants, isShowingMore = false) => {
     const displayList = allRestaurants.slice(0, visibleCount);
 
     listEl.innerHTML = displayList.map(r => `
-        <a href="../userfiles/restaurant-details.html?id=${r.id}" class="block bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+        <a href="../restaurantfiles/restaurant-details.html?id=${r.id}" class="block bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
             <div class="relative h-48 overflow-hidden">
                 <img src="${r.imageUrl || 'https://placehold.co/600x400?text=Restaurant'}" alt="${localEscapeHtml(r.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-orange-600 shadow-sm">

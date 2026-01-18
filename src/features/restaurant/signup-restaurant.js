@@ -50,7 +50,7 @@ const handleRestaurantSignup = async (event) => {
         base64Image = "";
 
         // sEND THEM TO LOGIN PAGE
-        setTimeout(() => { window.location.href = '../common/login.html'; }, 2000);
+        setTimeout(() => { window.location.href = '../commonfiles/login.html'; }, 2000);
 
     } catch (error) {
         // Axios errors are caught here.

@@ -1,6 +1,6 @@
 // --- IMPORTS ---
 import { restaurantService } from '../../api/restaurantService.js';
-
+import { authService } from '../../api/authService.js';
 // --- DOM Elements ---
 const DOM = {
     mainContent: document.getElementById('main-content'),
@@ -358,29 +358,84 @@ const handleAddMenuSubmit = async (e) => {
 };
 
 async function renderReviewsView() {
-    DOM.mainContent.innerHTML = `<div class="p-6"><h2 class="text-3xl font-bold mb-4">Customer Reviews</h2><div id="reviewsList">Loading...</div></div>`;
-    const listEl = document.getElementById("reviewsList");
-    try {
-        const resId = localStorage.getItem("restaurantId");
-        const response = await restaurantService.getReviews(resId);
-        const reviews = response.data.reviews || response.data || [];
+  DOM.mainContent.innerHTML = `
+    <div class="p-6">
+      <h2 class="text-3xl font-bold mb-4">Customer Reviews</h2>
+      <div id="reviewsList">Loading...</div>
+    </div>
+  `;
 
-        if (!reviews.length) {
-            listEl.innerHTML = `No reviews yet.`;
-            return;
-        }
+  const listEl = document.getElementById("reviewsList");
+  if (!listEl) return;
 
-        listEl.innerHTML = `<div class="space-y-4">${reviews.map(r => `
-            <div class="border rounded-lg p-4 bg-white">
+  try {
+    const resId = localStorage.getItem("restaurantId");
+    if (!resId) {
+      listEl.textContent = "Error: restaurantId not found.";
+      return;
+    }
+
+    const response = await restaurantService.getReviews(resId);
+
+    // API farklı formatta dönebilir:
+    // 1) { reviews: [...] }
+    // 2) [ ... ]
+    // 3) { data: { reviews: [...] } } gibi zaten axios ile response.data geliyor
+    let reviews = [];
+    if (Array.isArray(response?.data)) reviews = response.data;
+    else if (Array.isArray(response?.data?.reviews)) reviews = response.data.reviews;
+    else if (response?.data?.reviews) reviews = response.data.reviews;
+    else if (response?.data) reviews = response.data;
+
+    // Eğer hâlâ array değilse boş yap
+    if (!Array.isArray(reviews)) reviews = [];
+
+    if (reviews.length === 0) {
+      listEl.innerHTML = `No reviews yet.`;
+      return;
+    }
+
+    // Güvenli tarih seçimi + normalize
+    const pickDate = (r) =>
+      r?.createdAt ?? r?.createdDate ?? r?.date ?? r?.created_at ?? r?.timestamp ?? r?.reviewDate ?? null;
+
+    const safeFormatDate = (dateVal) => {
+      if (!dateVal) return "";
+      const s = String(dateVal);
+
+      // "2026-01-18 12:34:56" -> "2026-01-18T12:34:56"
+      const normalized = s.includes(" ") && !s.includes("T") ? s.replace(" ", "T") : s;
+
+      const d = new Date(normalized);
+      if (isNaN(d.getTime())) return ""; // istersen "N/A" yap
+      return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    };
+
+    listEl.innerHTML = `
+      <div class="space-y-4">
+        ${reviews
+          .map((r) => {
+            const dateText = safeFormatDate(pickDate(r));
+            return `
+              <div class="border rounded-lg p-4 bg-white">
                 <div class="flex justify-between font-semibold">
-                    <span>${escapeHtml(r.userName || "Anonymous")}</span>
-                    <span class="text-sm text-gray-500">${formatDate(r.createdAt)}</span>
+                  <span>${escapeHtml(r?.userName || "Anonymous")}</span>
+                  <span class="text-sm text-gray-500">${escapeHtml(dateText || "")}</span>
                 </div>
-                <div class="mt-2">Rating: ${renderStars(r.rating)}</div>
-                <p class="mt-2 text-gray-700">${escapeHtml(r.comment || "")}</p>
-            </div>`).join("")}</div>`;
-    } catch (err) { listEl.innerHTML = "Error loading reviews."; }
+                <div class="mt-2">Rating: ${renderStars(r?.rating)}</div>
+                <p class="mt-2 text-gray-700">${escapeHtml(r?.comment || "")}</p>
+              </div>
+            `;
+          })
+          .join("")}
+      </div>
+    `;
+  } catch (err) {
+    console.error("Error loading reviews:", err);
+    listEl.innerHTML = "Error loading reviews.";
+  }
 }
+
 
 // --- ROUTER ---
 const handleNavigation = (e) => {
@@ -445,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        import { authService } from "./authService.js";
+        
 
 const forgotBtn = document.getElementById("forgotBtn");
 
