@@ -16,7 +16,7 @@ let base64Image = "";
 const handleRestaurantSignup = async (event) => {
     event.preventDefault();
     
-    // Form verilerini topluyoruz
+    //We collect form data
     const restaurantData = {
         name: document.getElementById('restaurantName').value.trim(),
         email: document.getElementById('email').value.trim(),
@@ -31,23 +31,23 @@ const handleRestaurantSignup = async (event) => {
         messageEl.textContent = 'Registering...';
         messageEl.className = 'text-center text-gray-400 animate-pulse';
 
-        // YENİ YAPI: fetch yerine axios tabanlı servisimizi kullanıyoruz
+        // Instead of fetch, we use our axios-based service.
         const response = await restaurantService.register(restaurantData);
 
-        // Axios başarılı olduğunda (2xx status) doğrudan buraya geçer
+        // When axios is successful (2xx status), it goes directly here.
         messageEl.textContent = 'Restaurant registered successfully!';
         messageEl.className = 'text-center text-green-400 font-bold';
         
         if (signupForm) signupForm.reset();
-        imgPreview.src = ""; // Önizlemeyi temizle
+        imgPreview.src = ""; // Clear preview
         dropArea.classList.remove('has-image');
         base64Image = "";
 
-        // İstersen başarılı kayıt sonrası login'e yönlendirebilirsin:
-        // setTimeout(() => { window.location.href = '../common/login.html'; }, 2000);
+        // sEND THEM TO LOGIN PAGE
+        setTimeout(() => { window.location.href = '../common/login.html'; }, 2000);
 
     } catch (error) {
-        // Axios hataları burada yakalanır
+        // Axios errors are caught here.
         console.error("Signup Error:", error.response?.data || error.message);
         
         const backendMessage = error.response?.data?.message || "Error, Check informations one more time.";

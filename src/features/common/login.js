@@ -11,7 +11,7 @@ const submitButton = loginForm.querySelector('button[type="submit"]');
 const isRestaurantCheckbox = document.getElementById('isRestaurant');
 
 /**
- * Mesaj görüntüleme fonksiyonu
+ * Dunction Of The Show Messad
  */
 const displayMessage = (message, type) => {
     messageDisplay.textContent = message;
@@ -21,7 +21,7 @@ const displayMessage = (message, type) => {
 };
 
 /**
- * Login formu işleyicisi
+ *Login form handler
  */
 const handleLogin = async (event) => {
     event.preventDefault();
@@ -45,7 +45,7 @@ const handleLogin = async (event) => {
     try {
         const credentials = { usernameOrEmail: email, password: password };
 
-        // API Çağrısı
+        // API Call
         const response = isRestaurant 
             ? await restaurantService.login(credentials)
             : await userService.login(credentials);
@@ -53,7 +53,7 @@ const handleLogin = async (event) => {
         const data = response.data;
         console.log('Login Success Data:', data);
 
-        // Storage Temizliği ve Yeni Kayıt
+        // Storage Cleaning and New Registration
         localStorage.removeItem("restaurantId");
         localStorage.removeItem("userId");
         localStorage.removeItem("userRole");
