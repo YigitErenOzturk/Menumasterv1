@@ -234,15 +234,11 @@ const renderSettingsView = async () => {
                                     </div>
                                 </div>
                                 <button type="submit" class="w-full bg-orange-600 text-white font-black py-4 rounded-xl shadow-lg">SAVE CHANGES</button>
-                            </form>
+                            <button type="button" id="forgot-pass-btn"
+                            class="w-full mt-3 bg-gray-900 text-white font-bold py-3 rounded-xl shadow hover:bg-gray-800 transition">RESET PASSWORD</button>
+                                </form>
                             <div id="settings-message" class="mt-4 text-center font-bold text-sm"></div>
                         </div>
-                    </div>
-                    <div class="bg-white p-8 rounded-2xl border shadow-lg text-center h-fit">
-                        <h2 class="text-lg font-bold text-gray-800 mb-4">Security</h2>
-                        <button id="forgot-pass-btn" class="w-full border-2 border-orange-500/20 text-orange-600 font-bold py-3 rounded-xl">Send Reset Link</button>
-                        <div id="forgot-message" class="mt-4 text-xs font-medium uppercase"></div>
-                    </div>
                 </div>
             </div>`;
         attachSettingsListeners(resId, resData.email);
@@ -502,8 +498,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         
 
-const forgotBtn = document.getElementById("forgotBtn");
-
 // Modal elements
 const fpModal = document.getElementById("fpModal");
 const fpStep1 = document.getElementById("fpStep1");
@@ -523,89 +517,100 @@ const fpClose = document.getElementById("fpClose");
 const fpMsg = document.getElementById("fpMsg");
 
 function showMessage(text, ok = true) {
+  if (!fpMsg) return;
   fpMsg.textContent = text;
   fpMsg.style.color = ok ? "green" : "red";
 }
 
 function openModal() {
+  if (!fpModal) return;
+
   fpModal.style.display = "flex";
 
-  fpStep1.style.display = "block";
-  fpStep2.style.display = "none";
-  fpStep3.style.display = "none";
+  if (fpStep1) fpStep1.style.display = "block";
+  if (fpStep2) fpStep2.style.display = "none";
+  if (fpStep3) fpStep3.style.display = "none";
 
-  fpEmail.value = "";
-  fpCode.value = "";
-  fpNewPass.value = "";
-  fpNewPass2.value = "";
-  fpMsg.textContent = "";
+  if (fpEmail) fpEmail.value = "";
+  if (fpCode) fpCode.value = "";
+  if (fpNewPass) fpNewPass.value = "";
+  if (fpNewPass2) fpNewPass2.value = "";
+
+  if (fpMsg) fpMsg.textContent = "";
 }
 
 function closeModal() {
+  if (!fpModal) return;
   fpModal.style.display = "none";
 }
 
-// ✅ Forgot button opens popup
-if (forgotBtn) {
-  forgotBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    openModal();
+// ✅ Forgot button opens popup (works even if settings view is rendered later)
+// Supports BOTH ids: #forgotBtn and #forgot-pass-btn
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("#forgotBtn, #forgot-pass-btn");
+  if (!btn) return;
+  e.preventDefault();
+  openModal();
+});
+
+// ✅ Close popup
+if (fpClose) fpClose.addEventListener("click", closeModal);
+
+// ✅ STEP 1: Send code to email
+if (fpSendCode) {
+  fpSendCode.addEventListener("click", async () => {
+    const email = (fpEmail?.value || "").trim();
+    if (!email) return showMessage("Email is required.", false);
+
+    try {
+      showMessage("Sending verification code...", true);
+
+      await authService.forgotPassword(email);
+
+      showMessage("Verification code sent. Check your email.", true);
+
+      if (fpStep1) fpStep1.style.display = "none";
+      if (fpStep2) fpStep2.style.display = "block";
+    } catch (err) {
+      showMessage("Failed to send verification code.", false);
+    }
   });
 }
 
-// ✅ Close popup
-fpClose.addEventListener("click", closeModal);
-
-// ✅ STEP 1: Send code to email
-fpSendCode.addEventListener("click", async () => {
-  const email = fpEmail.value.trim();
-  if (!email) return showMessage("Email is required.", false);
-
-  try {
-    showMessage("Sending verification code...", true);
-
-    await authService.forgotPassword(email);
-
-    showMessage("Verification code sent. Check your email.", true);
-
-    fpStep1.style.display = "none";
-    fpStep2.style.display = "block";
-  } catch (err) {
-    showMessage("Failed to send verification code.", false);
-  }
-});
-
 // ✅ STEP 2: Continue to new password screen
-fpContinue.addEventListener("click", () => {
-  const code = fpCode.value.trim();
-  if (!code) return showMessage("Verification code is required.", false);
+if (fpContinue) {
+  fpContinue.addEventListener("click", () => {
+    const code = (fpCode?.value || "").trim();
+    if (!code) return showMessage("Verification code is required.", false);
 
-  showMessage("Code received. Please enter your new password.", true);
+    showMessage("Code received. Please enter your new password.", true);
 
-  fpStep2.style.display = "none";
-  fpStep3.style.display = "block";
-});
+    if (fpStep2) fpStep2.style.display = "none";
+    if (fpStep3) fpStep3.style.display = "block";
+  });
+}
 
 // ✅ STEP 3: Reset password
-fpResetBtn.addEventListener("click", async () => {
-  const email = fpEmail.value.trim();
-  const code = fpCode.value.trim();
-  const pass1 = fpNewPass.value;
-  const pass2 = fpNewPass2.value;
+if (fpResetBtn) {
+  fpResetBtn.addEventListener("click", async () => {
+    const email = (fpEmail?.value || "").trim();
+    const code = (fpCode?.value || "").trim();
+    const pass1 = fpNewPass?.value || "";
+    const pass2 = fpNewPass2?.value || "";
 
-  if (!pass1 || !pass2) return showMessage("Password is required.", false);
-  if (pass1 !== pass2) return showMessage("Passwords do not match.", false);
-  if (pass1.length < 6) return showMessage("Password must be at least 6 characters.", false);
+    if (!pass1 || !pass2) return showMessage("Password is required.", false);
+    if (pass1 !== pass2) return showMessage("Passwords do not match.", false);
+    if (pass1.length < 6) return showMessage("Password must be at least 6 characters.", false);
 
-  try {
-    showMessage("Resetting password...", true);
+    try {
+      showMessage("Resetting password...", true);
 
-    await authService.resetPassword(code, pass1, email);
+      await authService.resetPassword(code, pass1, email);
 
-    showMessage("Password reset successful ✅", true);
-    setTimeout(() => closeModal(), 800);
-  } catch (err) {
-    showMessage("Password reset failed ❌", false);
-  }
-});
-
+      showMessage("Password reset successful ✅", true);
+      setTimeout(() => closeModal(), 800);
+    } catch (err) {
+      showMessage("Password reset failed ❌", false);
+    }
+  });
+}
