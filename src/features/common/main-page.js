@@ -19,6 +19,9 @@ const localEscapeHtml = (str) => {
     return str.replace(/[&<>"']/g, (m) => map[m]);
 };
 
+const escapeHtml = localEscapeHtml;
+
+
 const renderRestaurants = (restaurants, isShowingMore = false) => {
     if (!listEl) return;
 
@@ -43,17 +46,24 @@ const renderRestaurants = (restaurants, isShowingMore = false) => {
                     ⭐ ${r.rating ? Number(r.rating).toFixed(1) : 'New'}
                 </div>
             </div>
-            <div class="p-5">
-                <h3 class="text-xl font-bold text-gray-900 mb-1 group-hover:text-orange-600 transition-colors">${localEscapeHtml(r.name)}</h3>
-                <div class="flex justify-between items-center border-t border-gray-100 pt-4">
-                    <span class="px-4 py-2 bg-orange-50 text-orange-600 rounded-lg text-sm font-bold group-hover:bg-orange-600 group-hover:text-white transition-all">View Menu</span>
+                <div class="p-4">
+                  <h3 class="text-lg font-semibold text-black truncate">${escapeHtml(r.name)}</h3>
+                   <p class="text-gray-700 text-sm mt-2 flex items-center gap-1">
+    <span class="text-orange-500">📍</span>
+    <span class="font-medium">${escapeHtml(r.city || 'Unknown')}</span>
+  </p>
+                  <p class="text-gray-600 text-sm mt-2 uppercase tracking-wider text-xs">${escapeHtml(r.address || 'Global')}</p>
                 </div>
-            </div>
         </a>
     `).join('');
 
     updateButtonVisibility();
 };
+
+const getCity = (r) => r?.city || r?.location?.city || r?.address?.city || r?.addressCity || '';
+const getPhone = (r) =>
+  r?.phoneNumber || r?.phone || r?.contactPhone || r?.contact?.phone || r?.restaurantPhone || '';
+
 
 /**
  *  Logic of the button show more
