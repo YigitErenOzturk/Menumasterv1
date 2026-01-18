@@ -3,3 +3,23 @@ body {
     background-color: #111827; /* Gray-900 */
     color: #f3f4f6; /* Gray-100 */
 }
+  .chat-icon {
+            background-color: #f97316 !important;
+        }
+
+        .chat-icon:hover {
+            background-color: #ea580c !important;
+        }
+
+        .chat-header {
+            background-color: #f97316 !important;
+            color: white !important;
+        }
+
+        #send-btn {
+            background-color: #f97316 !important;
+        }
+
+        #send-btn:hover {
+            background-color: #ea580c !important;
+        }

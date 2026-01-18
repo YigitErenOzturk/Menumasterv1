@@ -124,3 +124,24 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Searching for:", city, cuisine);
     });
 });
+
+ document.addEventListener("DOMContentLoaded", () => {
+            const helpLink = document.getElementById("help-link");
+            const helpModal = document.getElementById("help-modal");
+            const closeHelp = document.getElementById("close-help");
+
+            helpLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                helpModal.classList.remove("hidden");
+            });
+
+            closeHelp.addEventListener("click", () => {
+                helpModal.classList.add("hidden");
+            });
+
+            helpModal.addEventListener("click", (e) => {
+                if (e.target === helpModal) {
+                    helpModal.classList.add("hidden");
+                }
+            });
+        });
