@@ -445,7 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        import { authService } from "./authService.js";
+
 
 const forgotBtn = document.getElementById("forgotBtn");
 
