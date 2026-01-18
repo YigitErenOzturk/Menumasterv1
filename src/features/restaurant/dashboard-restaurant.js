@@ -302,20 +302,6 @@ const attachSettingsListeners = (resId, resEmail) => {
         });
     }
 
-    if (forgotBtn) {
-        forgotBtn.onclick = async () => {
-            const fMsg = document.getElementById('forgot-message');
-            try {
-                fMsg.textContent = "SENDING...";
-                await restaurantService.forgotPassword(resEmail);
-                fMsg.textContent = "SUCCESS! CHECK EMAIL.";
-                fMsg.className = "mt-4 text-center text-green-600 font-bold";
-            } catch (err) {
-                fMsg.textContent = "FAILED TO SEND.";
-                fMsg.className = "mt-4 text-center text-red-500";
-            }
-        };
-    }
 };
 
 // --- ACTIONS & UTILS ---
@@ -458,3 +444,113 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
+
+        import { authService } from "./authService.js";
+
+const forgotBtn = document.getElementById("forgotBtn");
+
+// Modal elements
+const fpModal = document.getElementById("fpModal");
+const fpStep1 = document.getElementById("fpStep1");
+const fpStep2 = document.getElementById("fpStep2");
+const fpStep3 = document.getElementById("fpStep3");
+
+const fpEmail = document.getElementById("fpEmail");
+const fpCode = document.getElementById("fpCode");
+const fpNewPass = document.getElementById("fpNewPass");
+const fpNewPass2 = document.getElementById("fpNewPass2");
+
+const fpSendCode = document.getElementById("fpSendCode");
+const fpContinue = document.getElementById("fpGoPass"); // code step button
+const fpResetBtn = document.getElementById("fpResetBtn");
+const fpClose = document.getElementById("fpClose");
+
+const fpMsg = document.getElementById("fpMsg");
+
+function showMessage(text, ok = true) {
+  fpMsg.textContent = text;
+  fpMsg.style.color = ok ? "green" : "red";
+}
+
+function openModal() {
+  fpModal.style.display = "flex";
+
+  fpStep1.style.display = "block";
+  fpStep2.style.display = "none";
+  fpStep3.style.display = "none";
+
+  fpEmail.value = "";
+  fpCode.value = "";
+  fpNewPass.value = "";
+  fpNewPass2.value = "";
+  fpMsg.textContent = "";
+}
+
+function closeModal() {
+  fpModal.style.display = "none";
+}
+
+// ✅ Forgot button opens popup
+if (forgotBtn) {
+  forgotBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    openModal();
+  });
+}
+
+// ✅ Close popup
+fpClose.addEventListener("click", closeModal);
+
+// ✅ STEP 1: Send code to email
+fpSendCode.addEventListener("click", async () => {
+  const email = fpEmail.value.trim();
+  if (!email) return showMessage("Email is required.", false);
+
+  try {
+    showMessage("Sending verification code...", true);
+
+    await authService.forgotPassword(email);
+
+    showMessage("Verification code sent. Check your email.", true);
+
+    fpStep1.style.display = "none";
+    fpStep2.style.display = "block";
+  } catch (err) {
+    showMessage("Failed to send verification code.", false);
+  }
+});
+
+// ✅ STEP 2: Continue to new password screen
+fpContinue.addEventListener("click", () => {
+  const code = fpCode.value.trim();
+  if (!code) return showMessage("Verification code is required.", false);
+
+  showMessage("Code received. Please enter your new password.", true);
+
+  fpStep2.style.display = "none";
+  fpStep3.style.display = "block";
+});
+
+// ✅ STEP 3: Reset password
+fpResetBtn.addEventListener("click", async () => {
+  const email = fpEmail.value.trim();
+  const code = fpCode.value.trim();
+  const pass1 = fpNewPass.value;
+  const pass2 = fpNewPass2.value;
+
+  if (!pass1 || !pass2) return showMessage("Password is required.", false);
+  if (pass1 !== pass2) return showMessage("Passwords do not match.", false);
+  if (pass1.length < 6) return showMessage("Password must be at least 6 characters.", false);
+
+  try {
+    showMessage("Resetting password...", true);
+
+    await authService.resetPassword(code, pass1, email);
+
+    showMessage("Password reset successful ✅", true);
+    setTimeout(() => closeModal(), 800);
+  } catch (err) {
+    showMessage("Password reset failed ❌", false);
+  }
+});
+

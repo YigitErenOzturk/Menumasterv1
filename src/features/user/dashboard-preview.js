@@ -1,5 +1,6 @@
 // --- IMPORTS ---
 import { userService } from '../../api/userService.js';
+import { authService } from '../../api/authService.js'; 
 
 // --- DOM Elements ---
 const DOM = {
@@ -310,9 +311,64 @@ window.renderSettingsView = async () => {
                 <div><label class="block text-xs font-bold uppercase mb-2">Address</label><textarea id="set-address" rows="3" class="w-full p-3 bg-gray-100 border rounded-xl resize-none">${escapeHtml(userData.address || '')}</textarea></div>
                 <button type="submit" class="w-full bg-orange-500 text-white font-black py-4 rounded-xl shadow-lg">SAVE CHANGES</button>
               </form>
+              <div class="mt-6 bg-white p-8 rounded-2xl border border-orange-400 shadow-2xl">
+ <h2 class="text-xl font-extrabold text-gray-900 mb-2">Reset Password</h2>
+  <p class="text-gray-600 mb-4 text-sm">We will send a verification code to your email.</p>
+
+  <button id="open-reset-modal"
+    class="w-full bg-black text-white font-black py-4 rounded-xl shadow-lg hover:opacity-90">
+    RESET PASSWORD
+  </button>
+</div>
+
+<!-- Reset Password Modal -->
+<div id="fpModal" class="fixed inset-0 hidden bg-black/50 backdrop-blur-sm items-center justify-center z-50">
+  <div class="bg-white rounded-2xl shadow-2xl p-6 w-[95%] max-w-md border-t-4 border-orange-500">
+    <h2 class="text-2xl font-extrabold text-gray-900 mb-4">Reset Password</h2>
+
+    <!-- Step 1 -->
+    <div id="fpStep1">
+      <label class="block text-sm font-bold mb-2">Email</label>
+      <input id="fpEmail" type="email" class="w-full p-3 border rounded-xl bg-gray-50" placeholder="Enter your email" />
+      <button id="fpSendCode" class="w-full mt-4 bg-orange-600 text-white font-bold py-3 rounded-xl hover:bg-orange-700">
+        Send Verification Code
+      </button>
+    </div>
+
+    <!-- Step 2 -->
+    <div id="fpStep2" class="hidden">
+      <label class="block text-sm font-bold mb-2">Verification Code</label>
+      <input id="fpCode" type="text" class="w-full p-3 border rounded-xl bg-gray-50" placeholder="Enter the code" />
+      <button id="fpGoPass" class="w-full mt-4 bg-black text-white font-bold py-3 rounded-xl hover:opacity-90">
+        Continue
+      </button>
+    </div>
+
+    <!-- Step 3 -->
+    <div id="fpStep3" class="hidden">
+      <label class="block text-sm font-bold mb-2">New Password</label>
+      <input id="fpNewPass" type="password" class="w-full p-3 border rounded-xl bg-gray-50" placeholder="New password" />
+
+      <label class="block text-sm font-bold mt-3 mb-2">Confirm Password</label>
+      <input id="fpNewPass2" type="password" class="w-full p-3 border rounded-xl bg-gray-50" placeholder="Confirm password" />
+
+      <button id="fpResetBtn" class="w-full mt-4 bg-orange-600 text-white font-bold py-3 rounded-xl hover:bg-orange-700">
+        Reset Password
+      </button>
+    </div>
+
+    <p id="fpMsg" class="mt-4 text-center text-sm font-semibold"></p>
+
+    <button id="fpClose" class="w-full mt-4 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 font-bold">
+      Close
+    </button>
+  </div>
+</div>
+
               <div id="settings-message" class="mt-4 text-center font-bold"></div>
             </div>`;
         attachSettingsListeners(userId, userData.email);
+        attachResetPasswordModal(userData.email);
     } catch (e) {
         console.error("Settings load error", e);
     }
@@ -406,3 +462,117 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     });
+
+    function attachResetPasswordModal(defaultEmail = "") {
+  const openBtn = document.getElementById("open-reset-modal");
+
+  const fpModal = document.getElementById("fpModal");
+  const fpStep1 = document.getElementById("fpStep1");
+  const fpStep2 = document.getElementById("fpStep2");
+  const fpStep3 = document.getElementById("fpStep3");
+
+  const fpEmail = document.getElementById("fpEmail");
+  const fpCode = document.getElementById("fpCode");
+  const fpNewPass = document.getElementById("fpNewPass");
+  const fpNewPass2 = document.getElementById("fpNewPass2");
+
+  const fpSendCode = document.getElementById("fpSendCode");
+  const fpGoPass = document.getElementById("fpGoPass");
+  const fpResetBtn = document.getElementById("fpResetBtn");
+  const fpClose = document.getElementById("fpClose");
+  const fpMsg = document.getElementById("fpMsg");
+
+  if (!openBtn || !fpModal) return;
+
+  const show = (el) => el.classList.remove("hidden");
+  const hide = (el) => el.classList.add("hidden");
+
+  const showMsg = (text, ok = true) => {
+    fpMsg.textContent = text;
+    fpMsg.className = ok
+      ? "mt-4 text-center text-sm font-semibold text-green-600"
+      : "mt-4 text-center text-sm font-semibold text-red-600";
+  };
+
+  const open = () => {
+    fpEmail.value = defaultEmail || "";
+    fpCode.value = "";
+    fpNewPass.value = "";
+    fpNewPass2.value = "";
+    fpMsg.textContent = "";
+
+    show(fpModal);
+    fpModal.classList.add("flex");
+    fpModal.classList.remove("hidden");
+
+    // step reset
+    show(fpStep1); hide(fpStep2); hide(fpStep3);
+  };
+
+  const close = () => {
+    fpModal.classList.add("hidden");
+    fpModal.classList.remove("flex");
+  };
+
+  openBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    open();
+  });
+
+  fpClose.addEventListener("click", close);
+
+  // click outside closes
+  fpModal.addEventListener("click", (e) => {
+    if (e.target === fpModal) close();
+  });
+
+  // STEP 1: send code
+  fpSendCode.addEventListener("click", async () => {
+    const email = fpEmail.value.trim();
+    if (!email) return showMsg("Email is required.", false);
+
+    try {
+      showMsg("Sending verification code...", true);
+      await authService.forgotPassword(email);
+      showMsg("Verification code sent. Check your email.", true);
+
+      hide(fpStep1); show(fpStep2);
+    } catch (err) {
+      showMsg("Failed to send verification code.", false);
+    }
+  });
+
+  // STEP 2: go to password step
+  fpGoPass.addEventListener("click", (e) => {
+    e.preventDefault();
+    const code = fpCode.value.trim();
+    if (!code) return showMsg("Verification code is required.", false);
+
+    showMsg("Code received. Please set a new password.", true);
+    hide(fpStep2); show(fpStep3);
+  });
+
+  // STEP 3: reset
+  fpResetBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    const email = fpEmail.value.trim();
+    const code = fpCode.value.trim();
+    const pass1 = fpNewPass.value;
+    const pass2 = fpNewPass2.value;
+
+    if (!pass1 || !pass2) return showMsg("Password is required.", false);
+    if (pass1 !== pass2) return showMsg("Passwords do not match.", false);
+    if (pass1.length < 6) return showMsg("Password must be at least 6 characters.", false);
+
+    try {
+      showMsg("Resetting password...", true);
+      await authService.resetPassword(code, pass1, email);
+      showMsg("Password reset successful.", true);
+
+      setTimeout(close, 800);
+    } catch (err) {
+      showMsg("Password reset failed.", false);
+    }
+  });
+}

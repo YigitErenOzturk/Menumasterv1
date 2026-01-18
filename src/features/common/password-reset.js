@@ -87,3 +87,120 @@ DOM.btns.reset.onclick = async () => {
     if (localStorage.getItem("fp_email")) showStep('reset');
     else showStep('email');
 })();
+
+const fpModal = document.getElementById("fpModal");
+const fpMsg = document.getElementById("fpMsg");
+
+const fpStepEmail = document.getElementById("fpStepEmail");
+const fpStepCode = document.getElementById("fpStepCode");
+const fpStepNewPass = document.getElementById("fpStepNewPass");
+
+const fpEmail = document.getElementById("fpEmail");
+const fpCode = document.getElementById("fpCode");
+const fpNewPass = document.getElementById("fpNewPass");
+const fpNewPass2 = document.getElementById("fpNewPass2");
+
+const fpSendCode = document.getElementById("fpSendCode");
+const fpVerifyCode = document.getElementById("fpVerifyCode");
+const fpResetPass = document.getElementById("fpResetPass");
+const fpClose = document.getElementById("fpClose");
+
+// forgotBtn senin butonun
+if (forgotBtn) {
+  forgotBtn.onclick = () => {
+    openFpModal();
+  };
+}
+
+function openFpModal() {
+  fpModal.classList.remove("hidden");
+  fpModal.classList.add("flex");
+  fpMsg.textContent = "";
+
+  // Step reset
+  fpStepEmail.classList.remove("hidden");
+  fpStepCode.classList.add("hidden");
+  fpStepNewPass.classList.add("hidden");
+
+  fpEmail.value = "";
+  fpCode.value = "";
+  fpNewPass.value = "";
+  fpNewPass2.value = "";
+}
+
+function closeFpModal() {
+  fpModal.classList.add("hidden");
+  fpModal.classList.remove("flex");
+}
+
+fpClose.onclick = closeFpModal;
+
+// Step 1: send code
+fpSendCode.onclick = async () => {
+  try {
+    fpMsg.textContent = "";
+    const email = fpEmail.value.trim();
+    if (!email) return showError("Email required.");
+
+    // ✅ service function
+    await restaurantService.sendResetCode(email);
+
+    // Step 2
+    fpStepEmail.classList.add("hidden");
+    fpStepCode.classList.remove("hidden");
+    showOk("Code sent. Check your email.");
+  } catch (e) {
+    showError("Failed to send code.");
+  }
+};
+
+// Step 2: verify code 
+fpVerifyCode.onclick = async () => {
+  try {
+    fpMsg.textContent = "";
+    const email = fpEmail.value.trim();
+    const code = fpCode.value.trim();
+    if (!code) return showError("Code required.");
+
+   
+
+    // Step 3
+    fpStepCode.classList.add("hidden");
+    fpStepNewPass.classList.remove("hidden");
+    showOk("Code accepted. Set a new password.");
+  } catch (e) {
+    showError("Invalid code.");
+  }
+};
+
+// Step 3: reset password
+fpResetPass.onclick = async () => {
+  try {
+    fpMsg.textContent = "";
+    const email = fpEmail.value.trim();
+    const code = fpCode.value.trim();
+    const p1 = fpNewPass.value;
+    const p2 = fpNewPass2.value;
+
+    if (!p1 || !p2) return showError("Password required.");
+    if (p1 !== p2) return showError("Passwords do not match.");
+    if (p1.length < 6) return showError("Password too short.");
+
+    // ✅ 
+    await restaurantService.resetPassword(email, code, p1);
+
+    showOk("Password reset successful.");
+    setTimeout(closeFpModal, 800);
+  } catch (e) {
+    showError("Failed to reset password.");
+  }
+};
+
+function showError(msg) {
+  fpMsg.textContent = msg;
+  fpMsg.className = "mt-3 text-center text-sm text-red-600";
+}
+function showOk(msg) {
+  fpMsg.textContent = msg;
+  fpMsg.className = "mt-3 text-center text-sm text-green-600";
+}
