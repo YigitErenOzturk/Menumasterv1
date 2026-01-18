@@ -10,6 +10,11 @@ const DOM = {
     restaurantNameDisplay: document.getElementById('res-name-display'),
     restaurantLogoDisplay: document.getElementById('res-logo-display')
 };
+const polishCities = [
+    "Warszawa", "Krakow", "Poznan", "Wroclaw", "Gdansk",
+    "Lodz", "Szczecin", "Katowice", "Lublin", "Bydgoszcz",
+    "Bialystok", "Gdynia", "Czestochowa", "Radom", "Sosnowiec"
+];
 
 // --- INITIAL DATA FETCH ---
 const setRestaurantInfo = async () => {
@@ -221,18 +226,42 @@ const renderSettingsView = async () => {
                             <form id="settings-form" class="space-y-5">
                                 <div><label class="block text-xs font-bold text-gray-500 uppercase">Restaurant Name</label><input type="text" id="set-name" value="${escapeHtml(resData.name)}" class="w-full p-3 bg-gray-50 border rounded-xl outline-none"></div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <div><label class="block text-xs font-bold text-gray-500 uppercase">Email</label><input type="email" value="${escapeHtml(resData.email)}" disabled class="w-full p-3 bg-gray-100 border rounded-xl cursor-not-allowed"></div>
+                                    <div><label class="block text-xs font-bold text-gray-500 uppercase">Email</label><input type="email" value="${escapeHtml(resData.email)}" disabled class="w-full p-3 bg-gray-300 border rounded-xl cursor-not-allowed"></div>
                                     <div><label class="block text-xs font-bold text-gray-500 uppercase">Phone</label><input type="text" id="set-phone" value="${escapeHtml(resData.phoneNumber || '')}" class="w-full p-3 bg-gray-50 border rounded-xl"></div>
                                 </div>
+                                <div class="mt-4">
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">City</label>
+                                <select id="set-city" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500 appearance-none cursor-pointer">
+                                    <option value="" disabled ${!resData.city ? 'selected' : ''}>Select City</option>
+                                    ${polishCities.map(city => `
+                                        <option value="${city}" ${resData.city === city ? 'selected' : ''}>
+                                            ${city}
+                                        </option>
+                                    `).join('')}
+                                </select>
+                            </div>
                                 <div><label class="block text-xs font-bold text-gray-500 uppercase">Description</label><textarea id="set-description" rows="3" class="w-full p-3 bg-gray-50 border rounded-xl">${escapeHtml(resData.description || '')}</textarea></div>
                                 <div><label class="block text-xs font-bold text-gray-500 uppercase">Address</label><textarea id="set-address" rows="2" class="w-full p-3 bg-gray-50 border rounded-xl">${escapeHtml(resData.address || '')}</textarea></div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase">Image</label>
-                                    <div id="drop-area" class="relative border-4 border-dashed rounded-2xl h-64 flex items-center justify-center overflow-hidden cursor-pointer">
-                                        <input type="file" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-50">
-                                        <img id="img-preview" src="${resData.imageUrl || ''}" class="absolute inset-0 w-full h-full object-cover ${resData.imageUrl ? '' : 'hidden'} z-30">
-                                        <p class="text-xs font-bold text-gray-400 uppercase z-10">Click to Upload</p>
+    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Image</label>
+    <div id="drop-area" class="group relative border-4 border-dashed rounded-2xl h-64 flex items-center justify-center overflow-hidden cursor-pointer transition-all hover:border-orange-500">
+        <input type="file" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 z-50 cursor-pointer">
+        
+        <img id="img-preview" src="${resData.imageUrl || ''}" class="absolute inset-0 w-full h-full object-cover ${resData.imageUrl ? '' : 'hidden'} z-20">
+        
+                                    <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
+                                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <span class="text-sm font-bold uppercase tracking-wider">Change Photo</span>
                                     </div>
+
+                                    <div class="flex flex-col items-center text-gray-400 z-10">
+                                        <p class="text-xs font-bold uppercase">Click to Upload</p>
+                                    </div>
+                                </div>
+                            </div>
                                 </div>
                                 <button type="submit" class="w-full bg-orange-600 text-white font-black py-4 rounded-xl shadow-lg">SAVE CHANGES</button>
                             <button type="button" id="forgot-pass-btn"
@@ -280,6 +309,7 @@ const attachSettingsListeners = (resId, resEmail) => {
                 phoneNumber: document.getElementById('set-phone').value.trim(),
                 description: document.getElementById('set-description').value.trim(),
                 address: document.getElementById('set-address').value.trim(),
+                city: document.getElementById('set-city').value,
                 imageUrl: currentBase64Image || imgPreview.src
             };
 
@@ -412,16 +442,16 @@ document.addEventListener('DOMContentLoaded', () => {
     renderReservationsView('pending');
 });
 
-  document.addEventListener("DOMContentLoaded", () => {
-            const helpLink = document.getElementById("help-link");
+document.addEventListener("DOMContentLoaded", () => {
+    const helpLink = document.getElementById("help-link");
 
-            if (helpLink) {
-                helpLink.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    let modal = document.getElementById('help-modal');
+    if (helpLink) {
+        helpLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            let modal = document.getElementById('help-modal');
 
-                    if (!modal) {
-                        const modalHTML = `
+            if (!modal) {
+                const modalHTML = `
                 <div id="help-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
                     <div class="bg-white rounded-lg shadow-2xl p-6 max-w-md text-center border-t-4 border-orange-500">
                         <h2 class="text-2xl font-bold text-gray-800 mb-3">Need Help?</h2>
@@ -429,18 +459,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button id="close-help-dynamic" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition shadow-md">Close</button>
                     </div>
                 </div>`;
-                        document.body.insertAdjacentHTML('beforeend', modalHTML);
-                        modal = document.getElementById('help-modal');
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                modal = document.getElementById('help-modal');
 
-                        document.getElementById('close-help-dynamic').addEventListener('click', () => {
-                            modal.classList.add('hidden');
-                        });
-                    }
-
-                    modal.classList.remove("hidden");
+                document.getElementById('close-help-dynamic').addEventListener('click', () => {
+                    modal.classList.add('hidden');
                 });
             }
+
+            modal.classList.remove("hidden");
         });
+    }
+});
 
 
 // Modal elements
@@ -462,40 +492,40 @@ const fpClose = document.getElementById("fpClose");
 const fpMsg = document.getElementById("fpMsg");
 
 function showMessage(text, ok = true) {
-  if (!fpMsg) return;
-  fpMsg.textContent = text;
-  fpMsg.style.color = ok ? "green" : "red";
+    if (!fpMsg) return;
+    fpMsg.textContent = text;
+    fpMsg.style.color = ok ? "green" : "red";
 }
 
 function openModal() {
-  if (!fpModal) return;
+    if (!fpModal) return;
 
-  fpModal.style.display = "flex";
+    fpModal.style.display = "flex";
 
-  if (fpStep1) fpStep1.style.display = "block";
-  if (fpStep2) fpStep2.style.display = "none";
-  if (fpStep3) fpStep3.style.display = "none";
+    if (fpStep1) fpStep1.style.display = "block";
+    if (fpStep2) fpStep2.style.display = "none";
+    if (fpStep3) fpStep3.style.display = "none";
 
-  if (fpEmail) fpEmail.value = "";
-  if (fpCode) fpCode.value = "";
-  if (fpNewPass) fpNewPass.value = "";
-  if (fpNewPass2) fpNewPass2.value = "";
+    if (fpEmail) fpEmail.value = "";
+    if (fpCode) fpCode.value = "";
+    if (fpNewPass) fpNewPass.value = "";
+    if (fpNewPass2) fpNewPass2.value = "";
 
-  if (fpMsg) fpMsg.textContent = "";
+    if (fpMsg) fpMsg.textContent = "";
 }
 
 function closeModal() {
-  if (!fpModal) return;
-  fpModal.style.display = "none";
+    if (!fpModal) return;
+    fpModal.style.display = "none";
 }
 
 // ✅ Forgot button opens popup (works even if settings view is rendered later)
 // Supports BOTH ids: #forgotBtn and #forgot-pass-btn
 document.addEventListener("click", (e) => {
-  const btn = e.target.closest("#forgotBtn, #forgot-pass-btn");
-  if (!btn) return;
-  e.preventDefault();
-  openModal();
+    const btn = e.target.closest("#forgotBtn, #forgot-pass-btn");
+    if (!btn) return;
+    e.preventDefault();
+    openModal();
 });
 
 // ✅ Close popup
@@ -503,59 +533,59 @@ if (fpClose) fpClose.addEventListener("click", closeModal);
 
 // ✅ STEP 1: Send code to email
 if (fpSendCode) {
-  fpSendCode.addEventListener("click", async () => {
-    const email = (fpEmail?.value || "").trim();
-    if (!email) return showMessage("Email is required.", false);
+    fpSendCode.addEventListener("click", async () => {
+        const email = (fpEmail?.value || "").trim();
+        if (!email) return showMessage("Email is required.", false);
 
-    try {
-      showMessage("Sending verification code...", true);
+        try {
+            showMessage("Sending verification code...", true);
 
-      await authService.forgotPassword(email);
+            await authService.forgotPassword(email);
 
-      showMessage("Verification code sent. Check your email.", true);
+            showMessage("Verification code sent. Check your email.", true);
 
-      if (fpStep1) fpStep1.style.display = "none";
-      if (fpStep2) fpStep2.style.display = "block";
-    } catch (err) {
-      showMessage("Failed to send verification code.", false);
-    }
-  });
+            if (fpStep1) fpStep1.style.display = "none";
+            if (fpStep2) fpStep2.style.display = "block";
+        } catch (err) {
+            showMessage("Failed to send verification code.", false);
+        }
+    });
 }
 
 // ✅ STEP 2: Continue to new password screen
 if (fpContinue) {
-  fpContinue.addEventListener("click", () => {
-    const code = (fpCode?.value || "").trim();
-    if (!code) return showMessage("Verification code is required.", false);
+    fpContinue.addEventListener("click", () => {
+        const code = (fpCode?.value || "").trim();
+        if (!code) return showMessage("Verification code is required.", false);
 
-    showMessage("Code received. Please enter your new password.", true);
+        showMessage("Code received. Please enter your new password.", true);
 
-    if (fpStep2) fpStep2.style.display = "none";
-    if (fpStep3) fpStep3.style.display = "block";
-  });
+        if (fpStep2) fpStep2.style.display = "none";
+        if (fpStep3) fpStep3.style.display = "block";
+    });
 }
 
 // ✅ STEP 3: Reset password
 if (fpResetBtn) {
-  fpResetBtn.addEventListener("click", async () => {
-    const email = (fpEmail?.value || "").trim();
-    const code = (fpCode?.value || "").trim();
-    const pass1 = fpNewPass?.value || "";
-    const pass2 = fpNewPass2?.value || "";
+    fpResetBtn.addEventListener("click", async () => {
+        const email = (fpEmail?.value || "").trim();
+        const code = (fpCode?.value || "").trim();
+        const pass1 = fpNewPass?.value || "";
+        const pass2 = fpNewPass2?.value || "";
 
-    if (!pass1 || !pass2) return showMessage("Password is required.", false);
-    if (pass1 !== pass2) return showMessage("Passwords do not match.", false);
-    if (pass1.length < 6) return showMessage("Password must be at least 6 characters.", false);
+        if (!pass1 || !pass2) return showMessage("Password is required.", false);
+        if (pass1 !== pass2) return showMessage("Passwords do not match.", false);
+        if (pass1.length < 6) return showMessage("Password must be at least 6 characters.", false);
 
-    try {
-      showMessage("Resetting password...", true);
+        try {
+            showMessage("Resetting password...", true);
 
-      await authService.resetPassword(code, pass1, email);
+            await authService.resetPassword(code, pass1, email);
 
-      showMessage("Password reset successful ✅", true);
-      setTimeout(() => closeModal(), 800);
-    } catch (err) {
-      showMessage("Password reset failed ❌", false);
-    }
-  });
+            showMessage("Password reset successful ✅", true);
+            setTimeout(() => closeModal(), 800);
+        } catch (err) {
+            showMessage("Password reset failed ❌", false);
+        }
+    });
 }
