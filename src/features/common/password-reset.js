@@ -3,7 +3,7 @@ import { authService } from '../../api/authService.js';
 const DOM = {
     steps: {
         email: document.getElementById("stepEmail"),
-        reset: document.getElementById("stepReset") // Artık kod ve yeni şifre aynı ekranda olabilir
+        reset: document.getElementById("stepReset") // Steps
     },
     inputs: {
         email: document.getElementById("email"),
@@ -37,18 +37,18 @@ const setBtnLoading = (btn, isLoading, loadingText = "İşleniyor...") => {
     }
 };
 
-// 1. ADIM: E-posta Gönder (Şifre sıfırlama kodu iste)
+// Step One
 DOM.btns.send.onclick = async () => {
     const email = DOM.inputs.email.value.trim();
     if (!email) return (DOM.feedback.email.textContent = "Lütfen e-posta girin.");
 
     try {
-        setBtnLoading(DOM.btns.send, true, "Gönderiliyor...");
+        setBtnLoading(DOM.btns.send, true, "Sending...");
         await authService.forgotPassword(email);
         
-        // E-postayı sonraki adımda kullanmak için sakla
+        // Keep e mail to use next step
         localStorage.setItem("fp_email", email);
-        showStep('reset'); // Doğrudan kod ve yeni şifre girme ekranına geç
+        showStep('reset'); // next to new page
     } catch (err) {
         DOM.feedback.email.textContent = err.response?.data?.message || "Kod gönderilemedi.";
     } finally {
@@ -56,33 +56,33 @@ DOM.btns.send.onclick = async () => {
     }
 };
 
-// 2. ADIM: Kod + Yeni Şifre ile Sıfırla
+// step 2
 DOM.btns.reset.onclick = async () => {
     const email = localStorage.getItem("fp_email");
     const code = DOM.inputs.code.value.trim();
     const pass = DOM.inputs.p1.value;
 
-    if (!code) return (DOM.feedback.reset.textContent = "Lütfen onay kodunu girin.");
-    if (pass.length < 6) return (DOM.feedback.reset.textContent = "Şifre en az 6 karakter olmalı.");
-    if (pass !== DOM.inputs.p2.value) return (DOM.feedback.reset.textContent = "Şifreler eşleşmiyor.");
+    if (!code) return (DOM.feedback.reset.textContent = "Enter Code");
+    if (pass.length < 6) return (DOM.feedback.reset.textContent = "The password must be at least 6 characters long..");
+    if (pass !== DOM.inputs.p2.value) return (DOM.feedback.reset.textContent = "Passwords Are Not Match.");
 
     try {
-        setBtnLoading(DOM.btns.reset, true, "Güncelleniyor...");
-        // Senin servis yapına uygun çağrı: code, newPassword, email
+        setBtnLoading(DOM.btns.reset, true, "Updating...");
+        // Call
         await authService.resetPassword(code, pass, email);
         
-        DOM.feedback.success.textContent = "Şifre Başarıyla Güncellendi ✅";
+        DOM.feedback.success.textContent = "Password Updated ✅";
         localStorage.removeItem("fp_email");
         
         setTimeout(() => window.location.href = "login.html", 2000);
     } catch (err) {
-        DOM.feedback.reset.textContent = err.response?.data?.message || "Şifre sıfırlanamadı.";
+        DOM.feedback.reset.textContent = err.response?.data?.message || "Password Could Not Change.";
     } finally {
         setBtnLoading(DOM.btns.reset, false);
     }
 };
 
-// Sayfa yenilense de kaldığı yeri hatırla
+// Remember where you left
 (function init() {
     if (localStorage.getItem("fp_email")) showStep('reset');
     else showStep('email');

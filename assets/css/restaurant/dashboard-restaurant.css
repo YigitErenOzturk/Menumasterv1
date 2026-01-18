@@ -16,37 +16,33 @@ body {
     background: #111827; /* Gray-900 */
 }
 
-  /* Resim varken placeholder'ı gizle */
+  /* Hide placeholder when image is displayed */
   #drop-area.has-image #upload-placeholder {
     display: none;
   }
 
-  /* Hover olunca overlay'i göster (Tailwind çalışmazsa garanti yöntem) */
-  #drop-area:hover .group-hover\:flex {
+/* Show overlay when hovering (Guaranteed method if Tailwind doesn't work) */  #drop-area:hover .group-hover\:flex {
     display: flex !important;
   }
   
-  /* Resim tam sığsın */
-  #img-preview {
+/* Image must fit perfectly */  #img-preview {
     max-height: 100%;
     width: 100%;
     object-fit: cover;
   }
   
-/* Tek sayili satirlar (1, 3, 5...) - Açik Turuncu */
+/* Odd-numbered rows (1, 3, 5...) - Light Orange */
  #category-select option:nth-of-type(odd) {
     background-color: #fff7ed !important; /* Orange-50 */
     color: #9a3412;
 }
 
-/* Çift sayili satirlar (2, 4, 6...) - Saf Beyaz */
-#category-select option:nth-of-type(even) {
+/* Even numbered rows (2, 4, 6...) - Pure White */#category-select option:nth-of-type(even) {
     background-color: #ffffff !important;
     color: #9a3412;
 }
 
-/* Seçili olan (Hover/Active) - Tam Turuncu */
-#category-select option:focus, 
+/* Selected (Hover/Active) - Full Orange */#category-select option:focus, 
 #category-select option:active,
 #category-select option:checked {
     background-color: #ea580c !important;

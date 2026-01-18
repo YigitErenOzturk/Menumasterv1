@@ -245,29 +245,3 @@
 </html>
 <script src="../assets/js/common/chatbot.js" defer></script>
 <script type="module" src="../../src/features/user/dashboard-preview.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const helpLink = document.getElementById("help-link");
-
-        if (helpLink) {
-            helpLink.addEventListener("click", (e) => {
-                e.preventDefault();
-                let modal = document.getElementById('help-modal');
-                if (!modal) {
-                    const modalHTML = `
-                <div id="help-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div class="bg-white rounded-lg shadow-2xl p-6 max-w-md text-center border-t-4 border-orange-500">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-3">Need Help?</h2>
-                        <p class="text-gray-600 mb-4">You can reach us at <span class="text-orange-600 font-medium">support@menumaster.com</span> or chat with our bot!</p>
-                        <button id="close-help-dynamic" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition shadow-md">Close</button>
-                    </div>
-                </div>`;
-                    document.body.insertAdjacentHTML('beforeend', modalHTML);
-                    modal = document.getElementById('help-modal');
-                    document.getElementById('close-help-dynamic').addEventListener('click', () => modal.classList.add('hidden'));
-                }
-                modal.classList.remove("hidden");
-            });
-        }
-    });
-</script>

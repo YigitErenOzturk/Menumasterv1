@@ -1,26 +1,26 @@
-/* Inter fontunu varsayılan yap */
+/* Set Inter font as default */
 body {
     font-family: 'Inter', sans-serif;
     transition: background-color 0.3s, color 0.3s;
 }
 
-/* Scrollbar Stili - Turuncu Tema ile Uyumlu */
+/* Scrollbar Style - Compatible with Orange Theme */
 ::-webkit-scrollbar {
     width: 8px;
 }
 ::-webkit-scrollbar-thumb {
-    /* İndigo yerine Orange-500 veya 600 kullanarak bütünlük sağlayabilirsin */
+  
     background: #ea580c; 
     border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #f97316; /* Hover durumunda biraz daha açık turuncu */
+    background: #f97316; 
 }
 ::-webkit-scrollbar-track {
-    background: #fff7ed; /* Orange-50 (Dashboard arka planınla uyumlu) */
+    background: #fff7ed; 
 }
 
-/* Yıldızların temel hali */
+/* Stars */
 .star-btn { 
     cursor: pointer; 
     transition: all 0.2s ease;
@@ -28,13 +28,13 @@ body {
     height: 32px;
 }
 
-/* Seçili (Aktif) Yıldız */
+/* Choosen Star */
 .star-active { 
-    color: #f59e0b !important; /* Turuncu-Sarı */
+    color: #f59e0b !important; 
     fill: #f59e0b !important;
 }
 
-/* Seçili Olmayan (Pasif) Yıldız */
+/* Not Chosen */
 .star-inactive { 
     color: #d1d5db !important; /* Gri */
     fill: #d1d5db !important;
