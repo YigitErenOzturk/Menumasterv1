@@ -401,7 +401,9 @@ async function renderReviewsView() {
             <div class="border rounded-lg p-4 bg-white">
                 <div class="flex justify-between font-semibold">
                     <span>${escapeHtml(r.userName || "Anonymous")}</span>
-                    <span class="text-sm text-gray-500">${formatDate(r.createdAt)}</span>
+                  <span class="text-sm text-gray-500">
+                 ${formatDate(r.createdAt || r.createdDate || r.date || r.created_at || r.updatedAt || r.updated_at)}
+                  </span>
                 </div>
                 <div class="mt-2">Rating: ${renderStars(r.rating)}</div>
                 <p class="mt-2 text-gray-700">${escapeHtml(r.comment || "")}</p>
