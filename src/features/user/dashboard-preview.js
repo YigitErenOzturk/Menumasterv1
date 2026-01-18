@@ -304,9 +304,9 @@ window.renderSettingsView = async () => {
               <form id="settings-form" class="bg-white p-8 rounded-2xl border border-orange-400 shadow-2xl space-y-5">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div><label class="block text-xs font-bold uppercase mb-2">Full Name</label><input type="text" id="set-name" value="${escapeHtml(userData.name)}" class="w-full p-3 bg-gray-100 border rounded-xl"></div>
-                  <div><label class="block text-xs font-bold uppercase mb-2">Username</label><input type="text" id="set-username" value="${escapeHtml(userData.username)}" class="w-full p-3 bg-gray-100 border rounded-xl"></div>
+                  <div><label class="block text-xs font-bold uppercase mb-2">Username</label><input type="text" id="set-username" value="${escapeHtml(userData.username)}" class="w-full p-3 bg-gray-300 text-gray-500 border rounded-xl cursor-not-allowed" readonly></div>
                 </div>
-                <div><label class="block text-xs font-bold uppercase mb-2">Email</label><input type="email" id="set-email" value="${escapeHtml(userData.email)}" class="w-full p-3 bg-gray-100 border rounded-xl"></div>
+                <div><label class="block text-xs font-bold uppercase mb-2">Email</label><input type="email" id="set-email" value="${escapeHtml(userData.email)}" class="w-full p-3 bg-gray-300 text-gray-500 border rounded-xl cursor-not-allowed" readonly></div>
                 <div><label class="block text-xs font-bold uppercase mb-2">Phone</label><input type="text" id="set-phone" value="${escapeHtml(userData.phoneNumber || '')}" class="w-full p-3 bg-gray-100 border rounded-xl"></div>
                 <div><label class="block text-xs font-bold uppercase mb-2">Address</label><textarea id="set-address" rows="3" class="w-full p-3 bg-gray-100 border rounded-xl resize-none">${escapeHtml(userData.address || '')}</textarea></div>
                 <button type="submit" class="w-full bg-orange-500 text-white font-black py-4 rounded-xl shadow-lg">SAVE CHANGES</button>

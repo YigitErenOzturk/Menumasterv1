@@ -7,6 +7,11 @@ const dropArea = document.getElementById('drop-area');
 const fileInput = document.getElementById('file-input');
 const imgPreview = document.getElementById('img-preview');
 const messageEl = document.getElementById('message');
+const polishCities = [
+  "Warszawa", "Krakow", "Poznan", "Wroclaw", "Gdansk",
+  "Lodz", "Szczecin", "Katowice", "Lublin", "Bydgoszcz",
+  "Bialystok", "Gdynia", "Czestochowa", "Radom", "Sosnowiec"
+];
 
 let base64Image = "";
 
@@ -24,6 +29,7 @@ const handleRestaurantSignup = async (event) => {
         phoneNumber: document.getElementById('phoneNumber').value.trim(),
         description: document.getElementById('description').value.trim(),
         address: document.getElementById('address').value.trim(),
+        city: document.getElementById('city').value,
         imageUrl: base64Image // FileReader ile doldurulan base64 string
     };
 
@@ -55,7 +61,20 @@ const handleRestaurantSignup = async (event) => {
         messageEl.className = 'text-center text-red-400';
     }
 };
+// --- Populate City Select ---
+function fillCitySelect() {
+  const citySelect = document.getElementById("city");
+  citySelect.innerHTML = '<option value="">Select a city</option>';
 
+  polishCities.forEach(city => {
+    const opt = document.createElement("option");
+    opt.value = city;
+    opt.textContent = city;
+    citySelect.appendChild(opt);
+  });
+}
+
+fillCitySelect();
 // --- Image Upload & Preview Logic ---
 
 function showPreview(file) {

@@ -4,6 +4,18 @@ import { userService } from '../../api/userService.js';
 document.addEventListener('DOMContentLoaded', () => {
     const signupForm = document.getElementById('signup-form');
     const messageDiv = document.getElementById('message');
+    const polishCities = [
+        "Warszawa",
+        "Krakow",
+        "Poznan",
+        "Wroclaw",
+        "Gdansk",
+        "Lodz",
+        "Szczecin",
+        "Katowice",
+        "Lublin",
+        "Bydgoszcz"
+    ];
 
     // --- HELPER: Show Message ---
     const showMsg = (text, type) => {
@@ -13,9 +25,23 @@ document.addEventListener('DOMContentLoaded', () => {
             type === 'error'
                 ? 'text-red-400 text-sm text-center'
                 : type === 'success'
-                ? 'text-green-400 text-sm text-center'
-                : 'text-yellow-400 text-sm text-center';
+                    ? 'text-green-400 text-sm text-center'
+                    : 'text-yellow-400 text-sm text-center';
     };
+
+ // --- Populate City Select ---
+function fillCitySelect() {
+  const citySelect = document.getElementById("city");
+  citySelect.innerHTML = '<option value="">Select a city</option>';
+
+  polishCities.forEach(city => {
+    const opt = document.createElement("option");
+    opt.value = city;
+    opt.textContent = city;
+    citySelect.appendChild(opt);
+  });
+}
+  fillCitySelect();
 
     // --- FORM SUBMIT HANDLER ---
     if (signupForm) {
@@ -27,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 username: document.getElementById('username').value.trim(),
                 email: document.getElementById('email').value.trim(),
                 phoneNumber: document.getElementById('phoneNumber').value.trim(),
+                city: document.getElementById('city').value,
                 address: document.getElementById('address').value.trim(),
                 password: document.getElementById('password').value.trim()
             };
