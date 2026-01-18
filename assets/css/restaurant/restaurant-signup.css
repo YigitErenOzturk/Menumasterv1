@@ -4,25 +4,6 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-/* Custom scrollbar style */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-thumb {
-    background: #4f46e5; /* Indigo-600 */
-    border-radius: 10px;
-}
-::-webkit-scrollbar-track {
-    background: #111827; /* Gray-900 */
-}
-.profile-upload-container {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 300px;
-    margin: 20px auto;
-  }
 
 /* We are hiding the actual input */  #file-input {
     display: none;

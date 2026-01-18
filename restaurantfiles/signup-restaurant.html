@@ -14,7 +14,7 @@
 </head>
 
 <body
-    class="bg-orange-50 text-gray-800 min-h-screen flex flex-col selection:bg-orange-200 selection:text-orange-900 relative">
+    class="bg-orange-50 text-gray-800 min-h-screen flex flex-col selection:bg-orange-200 selection:text-orange-900 relative overflow-x-hidden">
 
     <div
         class="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-orange-200/40 rounded-full blur-3xl pointer-events-none z-0">
@@ -51,13 +51,13 @@
                     <label for="restaurantName" class="text-sm font-bold text-gray-700">Restaurant Name</label>
                     <input id="restaurantName" name="restaurantName" type="text" required
                         class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
-                        placeholder="e.g., The Gourmet Place">
+                        placeholder="The Gourmet Place">
                 </div>
                 <div>
                     <label for="description" class="text-sm font-bold text-gray-700">Restaurant Description</label>
                     <input id="description" name="description" type="text" required
                         class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
-                        placeholder="e.g., A fine dining experience with international cuisine">
+                        placeholder="A fine dining experience with international cuisine">
                 </div>
                 <div>
                     <label for="city" class="text-sm font-bold text-gray-700">Restaurant City</label>
@@ -71,14 +71,14 @@
                     <label for="address" class="text-sm font-bold text-gray-700">Restaurant Address</label>
                     <input id="address" name="address" type="text" required
                         class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
-                        placeholder="123 Main Street, City">
+                        placeholder="ul. Marszałkowska 10/2, 00-001 Warszawa">
                 </div>
 
                 <div>
                     <label for="phoneNumber" class="text-sm font-bold text-gray-700">Restaurant Phone</label>
                     <input id="phoneNumber" name="phoneNumber" type="tel" autocomplete="tel" required
                         class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
-                        placeholder="+48 (555) 123 567">
+                        placeholder="+48 (___) ___ ___">
                 </div>
 
                 <div>
@@ -92,7 +92,7 @@
                     <label for="password" class="text-sm font-bold text-gray-700">Password</label>
                     <input id="password" name="password" type="password" autocomplete="new-password" required
                         class="mt-2 w-full p-3 text-gray-900 bg-orange-50 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition duration-150 placeholder-gray-400"
-                        placeholder="Create a strong password for your safety &#x1F512;">
+                        placeholder="Create a strong password (min. 8 characters) &#x1F512;">
                 </div>
 
 
