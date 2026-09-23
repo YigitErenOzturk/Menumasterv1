@@ -1,0 +1,150 @@
+🍽️ MenuMaster
+
+MenuMaster is a restaurant discovery and booking platform where users can explore restaurants, view menus, and make reservations quickly.
+
+------------------------------------------------------------
+FEATURES
+------------------------------------------------------------
+[✓] Restaurant Listing (Main Page)
+- Shows restaurant cards dynamically from API
+- “Show More Restaurants” pagination button
+- Rating badge (⭐ 4.5 etc.)
+
+[✓] Restaurant Card Details
+- Restaurant name
+- Restaurant rating
+- City + Phone + Address displayed under the title
+- “View Menu” button
+
+[✓] About Us Page
+- About MenuMaster section
+- FAQ section
+
+[✓] Responsive UI
+- TailwindCSS based design
+- Mobile menu support
+
+[✓] Live Counter
+- Shows how many people are “looking for food right now” (demo animation)
+
+[✓] Support / Help Modal
+- Support modal popup with email
+
+------------------------------------------------------------
+TECHNOLOGIES USED
+------------------------------------------------------------
+- HTML5
+- CSS3
+- TailwindCSS
+- JavaScript (ES Modules)
+- Axios
+- REST API services (restaurantService, userService, authService)
+
+------------------------------------------------------------
+PROJECT STRUCTURE (EXAMPLE)
+------------------------------------------------------------
+MenuMaster/
+│
+├── assets/
+│   ├── css/
+│   │   └── common/
+│   │       ├── main-page.css
+│   │       ├── chatbot.css
+│   │       └── aboutus.css
+│   └── logo/
+│       └── favicon.ico
+│
+├── pages/
+│   ├── commonfiles/
+│   │   ├── main-page.html
+│   │   ├── login.html
+│   │   └── aboutus.html
+│   ├── userfiles/
+│   │   └── signup.html
+│   └── restaurantfiles/
+│       └── restaurant-details.html
+│
+└── src/
+    ├── api/
+    │   ├── restaurantService.js
+    │   ├── userService.js
+    │   └── authService.js
+    │
+    └── features/
+        └── common/
+            ├── main-page.js
+            └── chatbot.js
+
+------------------------------------------------------------
+INSTALLATION & RUN
+------------------------------------------------------------
+1) Download / Clone the project
+
+2) Run with VS Code Live Server (Recommended)
+- Open main-page.html
+- Click "Go Live"
+
+NOTE:
+Live Server is recommended because ES module imports may not work correctly via file://
+
+------------------------------------------------------------
+MAIN PAGE RESTAURANT RENDERING
+------------------------------------------------------------
+Restaurants are fetched from API:
+
+const response = await restaurantService.getAll();
+renderRestaurants(response.data);
+
+Restaurant cards are created inside:
+- renderRestaurants() function
+
+------------------------------------------------------------
+CITY / PHONE / ADDRESS DISPLAY
+------------------------------------------------------------
+Under each restaurant title we show:
+- City
+- Phone number
+- Address
+
+IMPORTANT:
+To avoid “escapeHtml is not defined” error:
+
+Use this fix in main-page.js:
+const escapeHtml = localEscapeHtml;
+
+------------------------------------------------------------
+COMMON ISSUES
+------------------------------------------------------------
+1) ERROR: "escapeHtml is not defined"
+FIX:
+const escapeHtml = localEscapeHtml;
+
+2) City / Phone / Address not showing
+Reason: API might return different field names.
+Update these helpers if needed:
+
+getRestaurantCity(r)
+getRestaurantPhone(r)
+getRestaurantAddress(r)
+
+------------------------------------------------------------
+ABOUT US PAGE
+------------------------------------------------------------
+Create aboutus.html and add:
+- About MenuMaster section
+- FAQ section
+- aboutus.css for extra styling
+
+------------------------------------------------------------
+FUTURE IMPROVEMENTS
+------------------------------------------------------------
+- Search by cuisine
+- Filter by city (dropdown)
+- Reservation system improvements
+- Admin dashboard for restaurant owners
+
+------------------------------------------------------------
+AUTHOR
+------------------------------------------------------------
+Built for MenuMaster project.
+Feel free to improve the UI, add filters, and expand features ✅

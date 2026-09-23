@@ -1,0 +1,29 @@
+/* Set Inter font as default */
+body {
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Stars */
+.star-btn { 
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
+}
+
+/* Choosen Star */
+.star-active { 
+    color: #f59e0b !important; 
+    fill: #f59e0b !important;
+}
+
+/* Not Chosen */
+.star-inactive { 
+    color: #d1d5db !important; /* Gri */
+    fill: #d1d5db !important;
+}
+
+.star-btn:hover { 
+    transform: scale(1.2); 
+}
